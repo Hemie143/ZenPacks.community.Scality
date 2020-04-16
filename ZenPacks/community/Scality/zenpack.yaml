@@ -1,0 +1,45 @@
+name: ZenPacks.community.Scality
+
+zProperties:
+  DEFAULTS:
+    category: Scality
+  zScalityUsername:
+    type: string
+  zScalityPassword:
+    type: password
+
+classes:
+  ScalityRing:
+    base: [zenpacklib.Component]
+    label: Scality Ring
+
+class_relationships:
+  - ZenPacks.zenoss.LinuxMonitor.LinuxDevice 1:MC ScalityRing
+
+device_classes:
+  /Server/SSH/Linux/Scality:
+    zProperties:
+      zPingMonitorIgnore: true
+      zSnmpMonitorIgnore: true
+      zCollectorPlugins:
+        - zenoss.cmd.uname
+        - zenoss.cmd.linux.df
+        - zenoss.cmd.linux.cpuinfo
+        - zenoss.cmd.linux.interfaces
+        - zenoss.cmd.linux.lvm
+        - zenoss.cmd.linux.memory
+        - zenoss.cmd.linux.netstat_an
+        - zenoss.cmd.linux.netstat_rn
+        - zenoss.cmd.linux.process
+        - zenoss.cmd.linux.sudo_dmidecode
+        - zenoss.cmd.linux.os_release
+        - zenoss.cmd.linux.os_service
+        - community.json.scality
+
+    templates:
+      ScalityRing:
+        targetPythonClass: ZenPacks.community.Scality.ScalityRing
+        datasources: {}
+        graphs: {}
+
+
