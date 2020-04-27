@@ -4,8 +4,8 @@
 # NB: PACKAGES is deprecated
 NAME = "ZenPacks.community.Scality"
 VERSION = "1.0.0"
-AUTHOR = "Your Name Here"
-LICENSE = ""
+AUTHOR = "Laurent Hemeryck"
+LICENSE = "GPLv2"
 NAMESPACE_PACKAGES = ['ZenPacks', 'ZenPacks.community']
 PACKAGES = ['ZenPacks', 'ZenPacks.community', 'ZenPacks.community.Scality']
 INSTALL_REQUIRES = ['ZenPacks.zenoss.ZenPackLib']

@@ -9,12 +9,249 @@ zProperties:
     type: password
 
 classes:
+  ScalitySupervisor:
+    base: [zenpacklib.Component]
+    label: Scality Supervisor
+    monitoring_templates: [ScalitySupervisor]
+    properties:
+      supv2_status:
+        label: Status
+        grid_display: true
+        label_width: 60
+        datapoint: supervisor_status
+        renderer: Zenoss.render.severity
+      bizstoresup_status:
+        label: BizStore Status
+        grid_display: true
+        label_width: 80
+        datapoint: supervisor_bizstore_status
+        renderer: Zenoss.render.severity
+      version:
+        label: Version
+        grid_display: true
+        label_width: 60
+      complete_version:
+        label: Complete Version
+        grid_display: false
+
   ScalityRing:
     base: [zenpacklib.Component]
     label: Scality Ring
+    monitoring_templates: [ScalityRing]
+    properties:
+      type:
+        label: Type
+        grid_display: true
+        label_width: 60
+      status:
+        label: Status
+        grid_display: true
+        label_width: 60
+        datapoint: ring_status
+        renderer: Zenoss.render.severity
+      state:
+        label: State
+        grid_display: true
+        label_width: 60
+        datapoint: ring_state
+        renderer: Zenoss.render.severity
+      planning_period:
+        label: Planning period (days)
+        grid_display: false
+
+  ScalityServer:
+    base: [zenpacklib.Component]
+    label: Scality Server
+    monitoring_templates: [ScalityServer]
+    properties:
+      ip_address:
+        label: IP Address
+        grid_display: true
+        renderer: Zenoss.render.ipAddress
+      server_type:
+        label: Server Type
+        grid_display: true
+        label_width: 100
+      zone:
+        label: Zone
+        grid_display: true
+      diskstatus:
+        label: Disk Status
+        grid_display: true
+        datapoint: server_diskstatus
+        renderer: Zenoss.render.severity
+      status:
+        label: Status
+        grid_display: true
+        datapoint: server_status
+        renderer: Zenoss.render.severity
+      state:
+        label: State
+        grid_display: true
+        datapoint: server_state
+        renderer: Zenoss.render.severity
+      server_id:
+        label: Server ID
+        grid_display: false
+      disks:
+        label: Disks
+        grid_display: false
+      rings:
+        label: Rings
+        grid_display: false
+      roles:
+        label: Roles
+        grid_display: false
+
+  ScalityNode:
+    base: [zenpacklib.Component]
+    label: Scality Node
+    monitoring_templates: [ScalityNode]
+    properties:
+      state:
+        label: State
+        grid_display: true
+        datapoint: node_state
+        renderer: Zenoss.render.severity
+      reachable:
+        label: Reachable
+        grid_display: true
+        datapoint: node_reachable
+        renderer: Zenoss.render.severity
+      conf_mismatch:
+        label: Configuration
+        grid_display: true
+        datapoint: node_conf_mismatch
+        renderer: Zenoss.render.severity
+      tasks_blocked:
+        label: Stuck tasks
+        grid_display: true
+        datapoint: node_tasks_blocked
+        renderer: Zenoss.render.severity
+      ring:
+        label: Ring
+        grid_display: true
+      admin_endpoint:
+        label: Admin Endpoint
+        grid_display: false
+      chord_endpoint:
+        label: CHORD Endpoint
+        grid_display: false
+      server_endpoint:
+        label: Sagentd Endpoint
+        grid_display: false
+
+  ScalityS3Cluster:
+    base: [zenpacklib.Component]
+    label: Scality S3 Cluster
+    monitoring_templates: [ScalityS3Cluster]
+    properties:
+      cluster_health:
+        label: Cluster Health
+        grid_display: true
+        datapoint: s3cluster_health
+        renderer: Zenoss.render.severity
+      cluster_id:
+        label: Cluster ID
+        grid_display: false
+
+  ScalityDisk:
+    base: [zenpacklib.Component]
+    label: Scality Disk
+    monitoring_templates: [ScalityDisk]
+    properties:
+      status:
+        label: Status
+        grid_display: true
+        datapoint: disk_status
+        renderer: Zenoss.render.severity
+      state:
+        label: State
+        grid_display: true
+        datapoint: disk_state
+        renderer: Zenoss.render.severity
+      disk_id:
+        label: Disk ID
+        grid_display: false
+      host:
+        label: Host
+        grid_display: false
+      server_id:
+        label: Server ID
+        grid_display: false
+      fs_id:
+        label: Filesystem ID
+        grid_display: false
+      rings:
+        label: Rings
+        grid_display: false
+
+  ScalityVolume:
+    base: [zenpacklib.Component]
+    label: Scality Volume
+    monitoring_templates: [ScalityVolume]
+    properties:
+      status:
+        label: Status
+        grid_display: true
+        datapoint: volume_status
+        renderer: Zenoss.render.severity
+      volume_id:
+        label: Volume ID
+        grid_display: false
+      device_id:
+        label: Device ID
+        grid_display: false
+      supv2_id:
+        label: SupV2 backend ID
+        grid_display: false
+      data_ring:
+        label: Data RING
+        grid_display: false
+      meta_ring:
+        label: Meta RING
+        grid_display: false
+
+  ScalityConnector:
+    base: [zenpacklib.Component]
+    label: Scality Connector
+    monitoring_templates: [ScalityConnector]
+    properties:
+      status:
+        label: Status
+        grid_display: true
+        datapoint: connector_status
+        renderer: Zenoss.render.severity
+      state:
+        label: State
+        grid_display: true
+        datapoint: connector_state
+        renderer: Zenoss.render.severity
+      protocol:
+        label: Protocol
+        grid_display: true
+      detached:
+        label: Detached
+        grid_display: true
+      address:
+        label: Address
+        grid_display: true
+      connector_id:
+        label: ID
+        grid_display: false
+      ring:
+        label: RING
+        grid_display: true
 
 class_relationships:
-  - ZenPacks.zenoss.LinuxMonitor.LinuxDevice 1:MC ScalityRing
+  - Products.ZenModel.Device.Device 1:MC ScalitySupervisor
+  - Products.ZenModel.Device.Device 1:MC ScalityRing
+  - Products.ZenModel.Device.Device 1:MC ScalityServer
+  - Products.ZenModel.Device.Device 1:MC ScalityNode
+  - Products.ZenModel.Device.Device 1:MC ScalityS3Cluster
+  - Products.ZenModel.Device.Device 1:MC ScalityDisk
+  - Products.ZenModel.Device.Device 1:MC ScalityVolume
+  - Products.ZenModel.Device.Device 1:MC ScalityConnector
 
 device_classes:
   /Server/SSH/Linux/Scality:
@@ -34,12 +271,281 @@ device_classes:
         - zenoss.cmd.linux.sudo_dmidecode
         - zenoss.cmd.linux.os_release
         - zenoss.cmd.linux.os_service
-        - community.json.scality
+        - community.json.scalitysupervisor
+        - community.json.scalityring
+        - community.json.scalityserver
+        - community.json.scalitynode
+        - community.json.scalitys3cluster
+        - community.json.scalitydisk
+        - community.json.scalityvolume
+        - community.json.scalityconnector
 
     templates:
+      ScalitySupervisor:
+        targetPythonClass: ZenPacks.community.Scality.ScalitySupervisor
+        datasources:
+          supervisor:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.supervisor.Supervisor
+            datapoints:
+              status:
+                rrdtype: GAUGE
+              bizstore_status:
+                rrdtype: GAUGE
+
       ScalityRing:
         targetPythonClass: ZenPacks.community.Scality.ScalityRing
-        datasources: {}
-        graphs: {}
+        datasources:
+          ring:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.ring.Ring
+            datapoints:
+              status:
+                rrdtype: GAUGE
+              state:
+                rrdtype: GAUGE
+              diskspace_total:
+                rrdtype: GAUGE
+                rrdmin: 0
+              diskspace_used:
+                rrdtype: GAUGE
+                rrdmin: 0
+              diskspace_stored:
+                rrdtype: GAUGE
+                rrdmin: 0
+              diskspace_est_net_available:
+                rrdtype: GAUGE
+                rrdmin: 0
+              diskspace_net:
+                rrdtype: GAUGE
+                rrdmin: 0
+              number_of_objects:
+                rrdtype: GAUGE
+                rrdmin: 0
+              planning_growth_month:
+                rrdtype: GAUGE
+                rrdmin: 0
+              planning_days_before_threshold:
+                rrdtype: GAUGE
+                rrdmin: 0
+              unique_number_of_objects:
+                rrdtype: GAUGE
+                rrdmin: 0
+              object_average_size:
+                rrdtype: GAUGE
+                rrdmin: 0
+              object_average_unique_size:
+                rrdtype: GAUGE
+                rrdmin: 0
+        graphs:
+          Capacity:
+            units: bytes
+            miny: 0
+            base: true
+            graphpoints:
+              Stored Capacity:
+                lineType: AREA
+                dpName: ring_diskspace_stored
+                sequence: 1
+              Used Capacity:
+                lineType: AREA
+                dpName: ring_diskspace_used
+                sequence: 2
+              Total Capacity:
+                lineType: AREA
+                dpName: ring_diskspace_total
+                sequence: 3
+          Net Capacity:
+            units: bytes
+            miny: 0
+            base: true
+            graphpoints:
+              Net Used:
+                lineType: AREA
+                dpName: ring_diskspace_net
+                sequence: 1
+                stacked: true
+              Net Available:
+                lineType: AREA
+                dpName: ring_diskspace_est_net_available
+                sequence: 2
+                stacked: true
+          Forecast Monthly growth:
+            units: bytes
+            base: true
+            graphpoints:
+              Growth per month:
+                lineType: AREA
+                dpName: ring_planning_growth_month
+                sequence: 1
+          Forecast Days before reaching 80 percent capacity:
+            units: days
+            graphpoints:
+              Days remaining:
+                dpName: ring_planning_days_before_threshold
+                sequence: 1
+          Objects:
+            units: objects
+            miny: 0
+            graphpoints:
+              Objects:
+                dpName: ring_number_of_objects
+                sequence: 1
+              Unique Objects:
+                dpName: ring_unique_number_of_objects
+                sequence: 2
+          Objects Size:
+            units: bytes
+            miny: 0
+            base: true
+            graphpoints:
+              Average Object Size:
+                dpName: ring_object_average_size
+                sequence: 1
+              Average Unique Object Size:
+                dpName: ring_object_average_unique_size
+                sequence: 2
 
+      ScalityServer:
+        targetPythonClass: ZenPacks.community.Scality.ScalityServer
+        datasources:
+          server:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.server.Server
+            datapoints:
+              diskstatus:
+                rrdtype: GAUGE
+              status:
+                rrdtype: GAUGE
+              state:
+                rrdtype: GAUGE
 
+      ScalityNode:
+        targetPythonClass: ZenPacks.community.Scality.ScalityNode
+        datasources:
+          node:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.node.Node
+            datapoints:
+              state:
+                rrdtype: GAUGE
+              reachable:
+                rrdtype: GAUGE
+              conf_mismatch:
+                rrdtype: GAUGE
+              nb_chunks:
+                rrdtype: GAUGE
+              nb_tasks:
+                rrdtype: GAUGE
+              tasks_blocked:
+                rrdtype: GAUGE
+        graphs:
+          Chunks:
+            units: chunks
+            miny: 0
+            base: true
+            graphpoints:
+              Stored objects:
+                lineType: AREA
+                dpName: node_nb_chunks
+                sequence: 1
+          Tasks:
+            units: chunks
+            miny: 0
+            base: true
+            graphpoints:
+              Pending Tasks:
+                dpName: node_nb_tasks
+                sequence: 1
+
+      ScalityS3Cluster:
+        targetPythonClass: ZenPacks.community.Scality.ScalityS3Cluster
+        datasources:
+          s3cluster:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.s3cluster.S3Cluster
+            datapoints:
+              health:
+                rrdtype: GAUGE
+
+      ScalityDisk:
+        targetPythonClass: ZenPacks.community.Scality.ScalityDisk
+        datasources:
+          disk:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.disk.Disk
+            datapoints:
+              status:
+                rrdtype: GAUGE
+              state:
+                rrdtype: GAUGE
+              number_inodes:
+                rrdtype: GAUGE
+              diskspace_total:
+                rrdtype: GAUGE
+              diskspace_used:
+                rrdtype: GAUGE
+              diskspace_stored:
+                rrdtype: GAUGE
+              diskspace_used_perc:
+                rrdtype: GAUGE
+        graphs:
+          inodes:
+            units: inodes
+            miny: 0
+            graphpoints:
+              inodes:
+                lineType: AREA
+                dpName: disk_number_inodes
+                sequence: 1
+          Diskspace:
+            units: bytes
+            miny: 0
+            base: true
+            graphpoints:
+              Diskspace Total Capacity:
+                lineType: AREA
+                dpName: disk_diskspace_total
+                sequence: 1
+              Diskspace Used Capacity:
+                lineType: AREA
+                dpName: disk_diskspace_used
+                sequence: 2
+              Diskspace Used by RING:
+                lineType: AREA
+                dpName: disk_diskspace_stored
+                sequence: 3
+          Diskspace percentage:
+            units: percent
+            miny: 0
+            maxy: 100
+            graphpoints:
+              Diskspace Used Capacity:
+                dpName: disk_diskspace_used_perc
+                sequence: 1
+
+      ScalityVolume:
+        targetPythonClass: ZenPacks.community.Scality.ScalityVolume
+        datasources:
+          volume:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.volume.Volume
+            datapoints:
+              status:
+                rrdtype: GAUGE
+
+      ScalityConnector:
+        targetPythonClass: ZenPacks.community.Scality.ScalityConnector
+        datasources:
+          disk:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.connector.Connector
+            datapoints:
+              status:
+                rrdtype: GAUGE
+              state:
+                rrdtype: GAUGE
+
+event_classes:
+  /Status/Scality:
+    remove: false
