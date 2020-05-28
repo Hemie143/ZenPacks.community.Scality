@@ -22,11 +22,19 @@ class Supervisor(PythonDataSourcePlugin):
     proxy_attributes = (
         'zScalityUsername',
         'zScalityPassword',
+        'zScalityUseSSL',
     )
 
-    sup_status_maps = {
+    sup_status_values_maps = {
         'Unknown': 3,
+        'Invalid BizstoreSup credentials': 2,
+        'Unreachable': 1,
+        'Running': 0,
+    }
+
+    sup_status_severity_maps = {
         'Unreachable': 5,
+        'Unknown': 3,
         'Invalid BizstoreSup credentials': 3,
         'Running': 0,
     }
@@ -55,7 +63,8 @@ class Supervisor(PythonDataSourcePlugin):
         log.debug('Starting ScalityRing collect')
 
         ds0 = config.datasources[0]
-        url = 'https://{}/api/v0.1/status/'.format(config.id)
+        scheme = 'https' if ds0.zScalityUseSSL else 'http'
+        url = '{}://{}/api/v0.1/status/'.format(scheme, config.id)
         basicAuth = base64.encodestring('{}:{}'.format(ds0.zScalityUsername, ds0.zScalityPassword))
         authHeader = "Basic " + basicAuth.strip()
 
@@ -81,12 +90,13 @@ class Supervisor(PythonDataSourcePlugin):
         datasource = config.datasources[0]
         comp_id = datasource.component
 
-        status_value = self.sup_status_maps.get(result['supv2_status'], 3)
+        status_value = self.sup_status_values_maps.get(result['supv2_status'], 3)
+        severity_value = self.sup_status_severity_maps.get(result['supv2_status'], 3)
         data['values'][comp_id]['supervisor_status'] = status_value
         data['events'].append({
             'device': config.id,
             'component': comp_id,
-            'severity': status_value,
+            'severity': severity_value,
             'eventKey': 'SupervisorStatus',
             'eventClassKey': 'SupervisorStatus',
             'summary': 'Supervisor - Status is {}'.format(comp_id, result['supv2_status']),
@@ -94,12 +104,13 @@ class Supervisor(PythonDataSourcePlugin):
             'eventClass': '/Status',
         })
 
-        status_value = self.sup_status_maps.get(result['bizstoresup_status'], 3)
+        status_value = self.sup_status_values_maps.get(result['bizstoresup_status'], 3)
+        severity_value = self.sup_status_severity_maps.get(result['bizstoresup_status'], 3)
         data['values'][comp_id]['supervisor_bizstore_status'] = status_value
         data['events'].append({
             'device': config.id,
             'component': comp_id,
-            'severity': status_value,
+            'severity': severity_value,
             'eventKey': 'BizStoreStatus',
             'eventClassKey': 'BizStoreStatus',
             'summary': 'Supervisor - Biz Store Status is {}'.format(comp_id, result['bizstoresup_status']),

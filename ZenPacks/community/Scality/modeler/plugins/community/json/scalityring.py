@@ -19,6 +19,7 @@ class scalityring(PythonPlugin):
     requiredProperties = (
         'zScalityUsername',
         'zScalityPassword',
+        'zScalityUseSSL',
     )
 
     deviceProperties = PythonPlugin.deviceProperties + requiredProperties
@@ -28,13 +29,9 @@ class scalityring(PythonPlugin):
         """Asynchronously collect data from device. Return a deferred/"""
         log.info('%s: collecting data', device.id)
 
-        ip_address = device.manageIp
-        if not ip_address:
-            log.error("%s: IP Address cannot be empty", device.id)
-            returnValue(None)
-
         zScalityUsername = getattr(device, 'zScalityUsername', None)
         zScalityPassword = getattr(device, 'zScalityPassword', None)
+        zScalityUseSSL = getattr(device, 'zScalityUseSSL', None)
         if not zScalityUsername:
             log.error('%s: %s not set.', device.id, 'zScalityUsername')
             returnValue(None)
@@ -50,9 +47,14 @@ class scalityring(PythonPlugin):
         try:
             # TODO: if more rings than the limit (20)
             # TODO: check valid HTTP code and presence of _items in output
-            url = 'https://{}/api/v0.1/rings/'.format(ip_address)
+            scheme = 'https' if zScalityUseSSL else 'http'
+            url = '{}://{}/api/v0.1/rings/'.format(scheme, device.id)
+            log.debug('AAA - url: {}'.format(url))
             response = yield agent.request('GET', url, Headers(headers))
+            log.debug('AAA - response: {}'.format(response))
+            log.debug('AAA - response code: {}'.format(response.code))
             response_body = yield readBody(response)
+            log.debug('AAA - response_body: {}'.format(response_body))
             response_body = json.loads(response_body)
 
         except Exception, e:

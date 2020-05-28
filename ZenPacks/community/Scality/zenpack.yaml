@@ -7,6 +7,9 @@ zProperties:
     type: string
   zScalityPassword:
     type: password
+  zScalityUseSSL:
+    type: boolean
+    default: true
 
 classes:
   ScalitySupervisor:
@@ -14,18 +17,18 @@ classes:
     label: Scality Supervisor
     monitoring_templates: [ScalitySupervisor]
     properties:
-      supv2_status:
+      get_supv2_status:
         label: Status
+        api_only: true
+        api_backendtype: method
         grid_display: true
         label_width: 60
-        datapoint: supervisor_status
-        renderer: Zenoss.render.severity
-      bizstoresup_status:
+      get_bizstoresup_status:
         label: BizStore Status
+        api_only: true
+        api_backendtype: method
         grid_display: true
         label_width: 80
-        datapoint: supervisor_bizstore_status
-        renderer: Zenoss.render.severity
       version:
         label: Version
         grid_display: true
@@ -43,18 +46,18 @@ classes:
         label: Type
         grid_display: true
         label_width: 60
-      status:
+      get_status:
         label: Status
+        api_only: true
+        api_backendtype: method
         grid_display: true
         label_width: 60
-        datapoint: ring_status
-        renderer: Zenoss.render.severity
-      state:
+      get_state:
         label: State
+        api_only: true
+        api_backendtype: method
         grid_display: true
-        label_width: 60
-        datapoint: ring_state
-        renderer: Zenoss.render.severity
+        label_width: 80
       planning_period:
         label: Planning period (days)
         grid_display: false
@@ -108,11 +111,12 @@ classes:
     label: Scality Node
     monitoring_templates: [ScalityNode]
     properties:
-      state:
+      get_state:
         label: State
+        api_only: true
+        api_backendtype: method
         grid_display: true
-        datapoint: node_state
-        renderer: Zenoss.render.severity
+        label_width: 60
       reachable:
         label: Reachable
         grid_display: true
@@ -160,16 +164,18 @@ classes:
     label: Scality Disk
     monitoring_templates: [ScalityDisk]
     properties:
-      status:
+      get_status:
         label: Status
+        api_only: true
+        api_backendtype: method
         grid_display: true
-        datapoint: disk_status
-        renderer: Zenoss.render.severity
-      state:
+        label_width: 60
+      get_state:
         label: State
+        api_only: true
+        api_backendtype: method
         grid_display: true
-        datapoint: disk_state
-        renderer: Zenoss.render.severity
+        label_width: 60
       disk_id:
         label: Disk ID
         grid_display: false
@@ -217,16 +223,18 @@ classes:
     label: Scality Connector
     monitoring_templates: [ScalityConnector]
     properties:
-      status:
+      get_status:
         label: Status
+        api_only: true
+        api_backendtype: method
         grid_display: true
-        datapoint: connector_status
-        renderer: Zenoss.render.severity
-      state:
+        label_width: 60
+      get_state:
         label: State
+        api_only: true
+        api_backendtype: method
         grid_display: true
-        datapoint: connector_state
-        renderer: Zenoss.render.severity
+        label_width: 60
       protocol:
         label: Protocol
         grid_display: true
@@ -256,7 +264,7 @@ class_relationships:
 device_classes:
   /Server/SSH/Linux/Scality:
     zProperties:
-      zPingMonitorIgnore: true
+      zPingMonitorIgnore: false
       zSnmpMonitorIgnore: true
       zCollectorPlugins:
         - zenoss.cmd.uname
@@ -537,7 +545,7 @@ device_classes:
       ScalityConnector:
         targetPythonClass: ZenPacks.community.Scality.ScalityConnector
         datasources:
-          disk:
+          connector:
             type: Python
             plugin_classname: ZenPacks.community.Scality.dsplugins.connector.Connector
             datapoints:

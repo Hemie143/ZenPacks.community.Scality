@@ -19,6 +19,7 @@ class scalityconnector(PythonPlugin):
     requiredProperties = (
         'zScalityUsername',
         'zScalityPassword',
+        'zScalityUseSSL',
     )
 
     deviceProperties = PythonPlugin.deviceProperties + requiredProperties
@@ -30,6 +31,7 @@ class scalityconnector(PythonPlugin):
 
         zScalityUsername = getattr(device, 'zScalityUsername', None)
         zScalityPassword = getattr(device, 'zScalityPassword', None)
+        zScalityUseSSL = getattr(device, 'zScalityUseSSL', None)
         if not zScalityUsername:
             log.error('%s: %s not set.', device.id, 'zScalityUsername')
             returnValue(None)
@@ -48,7 +50,8 @@ class scalityconnector(PythonPlugin):
         try:
             while True:
                 # TODO: check valid HTTP code and presence of _items in output
-                url = 'https://{}/api/v0.1/volume_connectors/?offset={}&limit={}'.format(device.id, offset, limit)
+                scheme = 'https' if zScalityUseSSL else 'http'
+                url = '{}://{}/api/v0.1/volume_connectors/?offset={}&limit={}'.format(scheme, device.id, offset, limit)
                 response = yield agent.request('GET', url, Headers(headers))
                 response_body = yield readBody(response)
                 response_body = json.loads(response_body)

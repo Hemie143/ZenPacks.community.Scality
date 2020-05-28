@@ -22,6 +22,7 @@ class S3Cluster(PythonDataSourcePlugin):
     proxy_attributes = (
         'zScalityUsername',
         'zScalityPassword',
+        'zScalityUseSSL',
     )
 
     health_maps = {
@@ -52,7 +53,8 @@ class S3Cluster(PythonDataSourcePlugin):
         log.debug('Starting ScalityRing collect')
 
         ds0 = config.datasources[0]
-        url = 'https://{}/api/v0.1/s3_clusters/{}/'.format(config.id, ds0.params['cluster_id'])
+        scheme = 'https' if ds0.zScalityUseSSL else 'http'
+        url = '{}://{}/api/v0.1/s3_clusters/{}/'.format(scheme, config.id, ds0.params['cluster_id'])
         basicAuth = base64.encodestring('{}:{}'.format(ds0.zScalityUsername, ds0.zScalityPassword))
         authHeader = "Basic " + basicAuth.strip()
 

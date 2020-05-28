@@ -22,6 +22,7 @@ class Volume(PythonDataSourcePlugin):
     proxy_attributes = (
         'zScalityUsername',
         'zScalityPassword',
+        'zScalityUseSSL',
     )
 
     status_maps = {
@@ -55,7 +56,8 @@ class Volume(PythonDataSourcePlugin):
         log.debug('Starting ScalityRing collect')
 
         ds0 = config.datasources[0]
-        url = 'https://{}/api/v0.1/volumes/{}/'.format(config.id, ds0.params['volume_id'])
+        scheme = 'https' if ds0.zScalityUseSSL else 'http'
+        url = '{}://{}/api/v0.1/volumes/{}/'.format(scheme, config.id, ds0.params['volume_id'])
         basicAuth = base64.encodestring('{}:{}'.format(ds0.zScalityUsername, ds0.zScalityPassword))
         authHeader = "Basic " + basicAuth.strip()
 

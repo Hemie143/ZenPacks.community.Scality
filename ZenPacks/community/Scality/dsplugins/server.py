@@ -22,6 +22,7 @@ class Server(PythonDataSourcePlugin):
     proxy_attributes = (
         'zScalityUsername',
         'zScalityPassword',
+        'zScalityUseSSL',
     )
 
     status_maps = {
@@ -60,7 +61,8 @@ class Server(PythonDataSourcePlugin):
         log.debug('Starting ScalityServer collect')
 
         ds0 = config.datasources[0]
-        url = 'https://{}/api/v0.1/servers/{}/'.format(config.id, ds0.params['server_id'])
+        scheme = 'https' if ds0.zScalityUseSSL else 'http'
+        url = '{}://{}/api/v0.1/servers/{}/'.format(scheme, config.id, ds0.params['server_id'])
         basicAuth = base64.encodestring('{}:{}'.format(ds0.zScalityUsername, ds0.zScalityPassword))
         authHeader = "Basic " + basicAuth.strip()
 

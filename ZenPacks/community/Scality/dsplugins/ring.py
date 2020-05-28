@@ -22,12 +22,31 @@ class Ring(PythonDataSourcePlugin):
     proxy_attributes = (
         'zScalityUsername',
         'zScalityPassword',
+        'zScalityUseSSL',
     )
 
     status_maps = {
         'OK': 0,
         'WARNING': 3,
         'CRITICAL': 5,
+    }
+
+    state_maps = {
+        'RUN': 0,                       # OK
+        'BALANCING': 1,                 # WARNING
+        'CONFIG MISMATCH': 2,
+        'OFFLINE': 3,
+        'DISK USAGE WARNING': 4,
+        'LOW STORAGE': 5,
+        'ARC_REBUILD_NOK': 6,           # WARNING / CRITICAL
+        'MISSING NODE': 7,              # CRITICAL
+        'INCOMPLETE': 8,
+        'NOT STABILIZED': 9,
+        'OUT OF SERVICE': 10,
+        'DUPLICATE KEY': 11,
+        'DISK FULL': 12,
+        'SPLIT': 13,
+        'LOOP': 14,
     }
 
     @classmethod
@@ -54,7 +73,9 @@ class Ring(PythonDataSourcePlugin):
         log.debug('Starting ScalityRing collect')
 
         ds0 = config.datasources[0]
-        url = 'https://{}/api/v0.1/rings/{}/'.format(config.id, ds0.params['ring_name'])
+        scheme = 'https' if ds0.zScalityUseSSL else 'http'
+        url = '{}://{}/api/v0.1/rings/{}/'.format(scheme, config.id, ds0.params['ring_name'])
+        # log.debug('AAA : url : {}'.format(url))
         basicAuth = base64.encodestring('{}:{}'.format(ds0.zScalityUsername, ds0.zScalityPassword))
         authHeader = "Basic " + basicAuth.strip()
 
@@ -105,16 +126,18 @@ class Ring(PythonDataSourcePlugin):
         })
 
         # State
-        # Possible states ??: RUN, BALANCING, LOOP, ARC_REBUILD_NOK
+        # log.debug('AAA : state: {}'.format(ring_metrics['state']))
+        # log.debug('AAA : state: {}'.format(type(ring_metrics['state'])))
         if ring_metrics['state'] == ["RUN"]:
-            state_value = 0
+            state_severity_value = 0
         else:
-            state_value = 3
+            state_severity_value = 3
+        state_value = max([self.state_maps.get(s, -1) for s in ring_metrics['state']])
         data['values'][comp_id]['ring_state'] = state_value
         data['events'].append({
             'device': config.id,
             'component': comp_id,
-            'severity': state_value,
+            'severity': state_severity_value,
             'eventKey': 'RingState',
             'eventClassKey': 'RingState',
             'summary': 'Ring {} - State is {}'.format(comp_id, ', '.join(ring_metrics['state'])),

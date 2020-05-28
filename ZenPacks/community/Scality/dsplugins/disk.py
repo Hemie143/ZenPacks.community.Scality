@@ -22,6 +22,7 @@ class Disk(PythonDataSourcePlugin):
     proxy_attributes = (
         'zScalityUsername',
         'zScalityPassword',
+        'zScalityUseSSL',
     )
 
     status_maps = {
@@ -30,7 +31,11 @@ class Disk(PythonDataSourcePlugin):
         'CRITICAL': 5,
     }
 
-    state_maps = {
+    state_value_maps = {
+        'OK': 0,
+    }
+
+    state_severity_maps = {
         'OK': 0,
     }
 
@@ -58,7 +63,8 @@ class Disk(PythonDataSourcePlugin):
         log.debug('Starting ScalityRing collect')
 
         ds0 = config.datasources[0]
-        url = 'https://{}/api/v0.1/disks/{}/'.format(config.id, ds0.params['disk_id'])
+        scheme = 'https' if ds0.zScalityUseSSL else 'http'
+        url = '{}://{}/api/v0.1/disks/{}/'.format(scheme, config.id, ds0.params['disk_id'])
         basicAuth = base64.encodestring('{}:{}'.format(ds0.zScalityUsername, ds0.zScalityPassword))
         authHeader = "Basic " + basicAuth.strip()
 
@@ -98,15 +104,13 @@ class Disk(PythonDataSourcePlugin):
             'eventClass': '/Status',
         })
 
-        disk_states = disk_metrics['state']
-        state_value = 0
-        for v in disk_states:
-            state_value = max(state_value, self.state_maps.get(v, 3))
+        state_value = max([self.state_value_maps.get(s, -1) for s in disk_metrics['state']])
+        state_severity = max([self.state_severity_maps.get(s, 3) for s in disk_metrics['state']])
         data['values'][comp_id]['disk_state'] = state_value
         data['events'].append({
             'device': config.id,
             'component': comp_id,
-            'severity': state_value,
+            'severity': state_severity,
             'eventKey': 'DiskStatus',
             'eventClassKey': 'DiskStatus',
             'summary': 'Disk {} - State is {}'.format(comp_id, disk_metrics['state']),
