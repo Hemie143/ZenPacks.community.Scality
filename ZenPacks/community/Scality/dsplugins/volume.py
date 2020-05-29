@@ -25,7 +25,14 @@ class Volume(PythonDataSourcePlugin):
         'zScalityUseSSL',
     )
 
-    status_maps = {
+    status_value_maps = {
+        'OK': 0,
+        'WARNING': 1,
+        'NO CONNECTOR': 2,
+        'CRITICAL': 3,
+    }
+
+    status_severity_maps = {
         'CRITICAL': 5,
         'WARNING': 3,
         'OK': 0,
@@ -84,12 +91,13 @@ class Volume(PythonDataSourcePlugin):
         comp_id = datasource.component
         volume_metrics = result['_items'][0]
 
-        status_value = self.status_maps.get(volume_metrics['status'], 3)
+        status_value = self.status_value_maps.get(volume_metrics['status'], 3)
+        status_severity = self.status_severity_maps.get(volume_metrics['status'], 3)
         data['values'][comp_id]['volume_status'] = status_value
         data['events'].append({
             'device': config.id,
             'component': comp_id,
-            'severity': status_value,
+            'severity': status_severity,
             'eventKey': 'VolumeStatus',
             'eventClassKey': 'VolumeStatus',
             'summary': 'Volume {} - Status is {}'.format(comp_id, volume_metrics['status']),

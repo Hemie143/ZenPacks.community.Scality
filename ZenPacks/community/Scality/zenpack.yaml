@@ -83,16 +83,18 @@ classes:
         grid_display: true
         datapoint: server_diskstatus
         renderer: Zenoss.render.severity
-      status:
+      get_status:
         label: Status
+        api_only: true
+        api_backendtype: method
         grid_display: true
-        datapoint: server_status
-        renderer: Zenoss.render.severity
-      state:
+        label_width: 60
+      get_state:
         label: State
+        api_only: true
+        api_backendtype: method
         grid_display: true
-        datapoint: server_state
-        renderer: Zenoss.render.severity
+        label_width: 80
       server_id:
         label: Server ID
         grid_display: false
@@ -150,11 +152,12 @@ classes:
     label: Scality S3 Cluster
     monitoring_templates: [ScalityS3Cluster]
     properties:
-      cluster_health:
+      get_cluster_health:
         label: Cluster Health
+        api_only: true
+        api_backendtype: method
         grid_display: true
-        datapoint: s3cluster_health
-        renderer: Zenoss.render.severity
+        label_width: 60
       cluster_id:
         label: Cluster ID
         grid_display: false
@@ -197,11 +200,12 @@ classes:
     label: Scality Volume
     monitoring_templates: [ScalityVolume]
     properties:
-      status:
+      get_status:
         label: Status
+        api_only: true
+        api_backendtype: method
         grid_display: true
-        datapoint: volume_status
-        renderer: Zenoss.render.severity
+        label_width: 60
       volume_id:
         label: Volume ID
         grid_display: false

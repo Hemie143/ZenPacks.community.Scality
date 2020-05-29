@@ -31,7 +31,13 @@ class Server(PythonDataSourcePlugin):
         'CRITICAL': 5,
     }
 
-    state_maps = {
+    state_value_maps = {
+        'ONLINE': 0,
+        'MISSING': 1,
+        'OFFLINE': 2,
+    }
+
+    state_severity_maps = {
         'ONLINE': 0,
         'MISSING': 5,
         'OFFLINE': 5,
@@ -102,14 +108,13 @@ class Server(PythonDataSourcePlugin):
             'eventClass': '/Status',
         })
 
-        state_value = 0
-        for v in server_metrics['state']:
-            state_value = max(state_value, self.state_maps.get(v, 3))
-        data['values'][comp_id]['server_state'] = status_value
+        state_value = max([self.state_value_maps.get(s, 3) for s in server_metrics['state']])
+        state_severity = max([self.state_severity_maps.get(s, 3) for s in server_metrics['state']])
+        data['values'][comp_id]['server_state'] = state_value
         data['events'].append({
             'device': config.id,
             'component': comp_id,
-            'severity': state_value,
+            'severity': state_severity,
             'eventKey': 'ServerStatus',
             'eventClassKey': 'ServerStatus',
             'summary': 'Server {} - State is {}'.format(comp_id, server_metrics['state']),
@@ -133,7 +138,7 @@ class Server(PythonDataSourcePlugin):
         data['events'].append({
             'device': config.id,
             'component': comp_id,
-            'severity': status_value,
+            'severity': disk_value,
             'eventKey': 'ServerDiskStatus',
             'eventClassKey': 'ServerDiskStatus',
             'summary': msg,
