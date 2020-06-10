@@ -42,6 +42,8 @@ classes:
     label: Scality Ring
     monitoring_templates: [ScalityRing]
     properties:
+      DEFAULTS:
+        grid_display: false
       type:
         label: Type
         grid_display: true
@@ -66,6 +68,9 @@ classes:
     base: [zenpacklib.Component]
     label: Scality Server
     monitoring_templates: [ScalityServer]
+    relationships:
+      scalitySupervisor:
+        grid_display: false
     properties:
       ip_address:
         label: IP Address
@@ -257,13 +262,13 @@ classes:
 
 class_relationships:
   - Products.ZenModel.Device.Device 1:MC ScalitySupervisor
-  - Products.ZenModel.Device.Device 1:MC ScalityRing
-  - Products.ZenModel.Device.Device 1:MC ScalityServer
-  - Products.ZenModel.Device.Device 1:MC ScalityNode
-  - Products.ZenModel.Device.Device 1:MC ScalityS3Cluster
-  - Products.ZenModel.Device.Device 1:MC ScalityDisk
-  - Products.ZenModel.Device.Device 1:MC ScalityVolume
-  - Products.ZenModel.Device.Device 1:MC ScalityConnector
+  - ScalitySupervisor 1:MC ScalityS3Cluster
+  - ScalitySupervisor 1:MC ScalityServer
+  - ScalitySupervisor 1:MC ScalityVolume
+  - ScalitySupervisor 1:MC ScalityRing
+  - ScalityServer 1:MC ScalityDisk
+  - ScalityRing 1:MC ScalityNode
+  - ScalityRing 1:MC ScalityConnector
 
 device_classes:
   /Server/SSH/Linux/Scality:
@@ -284,12 +289,12 @@ device_classes:
         - zenoss.cmd.linux.os_release
         - zenoss.cmd.linux.os_service
         - community.json.scalitysupervisor
-        - community.json.scalityring
-        - community.json.scalityserver
-        - community.json.scalitynode
         - community.json.scalitys3cluster
-        - community.json.scalitydisk
+        - community.json.scalityserver
         - community.json.scalityvolume
+        - community.json.scalityring
+        - community.json.scalitydisk
+        - community.json.scalitynode
         - community.json.scalityconnector
 
     templates:
@@ -561,3 +566,20 @@ device_classes:
 event_classes:
   /Status/Scality:
     remove: false
+  /Status/Scality/Supervisor:
+    remove: false
+  /Status/Scality/Connector:
+    remove: false
+  /Status/Scality/Disk:
+    remove: false
+  /Status/Scality/Node:
+    remove: false
+  /Status/Scality/Ring:
+    remove: false
+  /Status/Scality/S3Cluster:
+    remove: false
+  /Status/Scality/Server:
+    remove: false
+  /Status/Scality/Volume:
+    remove: false
+

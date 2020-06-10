@@ -91,7 +91,7 @@ class Node(PythonDataSourcePlugin):
             'eventClassKey': 'NodeStatus',
             'summary': 'Node {} - State is {}'.format(comp_id, node_metrics['state']),
             'message': 'Node {} - State is {}'.format(comp_id, node_metrics['state']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Node',
         })
 
         reachable = node_metrics['reachable']
@@ -106,7 +106,7 @@ class Node(PythonDataSourcePlugin):
             'eventClassKey': 'NodeStatus',
             'summary': msg,
             'message': msg,
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Node',
         })
 
         conf_ok = not node_metrics['conf_mismatch']
@@ -121,7 +121,7 @@ class Node(PythonDataSourcePlugin):
             'eventClassKey': 'NodeStatus',
             'summary': msg,
             'message': msg,
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Node',
         })
 
         tasks_ok = not node_metrics['tasks_blocked']
@@ -136,13 +136,11 @@ class Node(PythonDataSourcePlugin):
             'eventClassKey': 'NodeStatus',
             'summary': msg,
             'message': msg,
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Node',
         })
 
         data['values'][comp_id]['node_nb_chunks'] = node_metrics['nb_chunks']
         data['values'][comp_id]['node_nb_tasks'] = node_metrics['nb_tasks']
-
-        log.debug('AAA Node {} data: {}'.format(comp_id, data))
 
         return data
 

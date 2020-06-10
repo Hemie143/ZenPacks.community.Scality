@@ -77,7 +77,7 @@ class scalityring(PythonPlugin):
             om_ring.planning_period = ring['planning_used_capacity_age']
             ring_maps.append(om_ring)
 
-        rm.append(RelationshipMap(compname='',
+        rm.append(RelationshipMap(compname='scalitySupervisors/Supervisor',
                                   relname='scalityRings',
                                   modname='ZenPacks.community.Scality.ScalityRing',
                                   objmaps=ring_maps))

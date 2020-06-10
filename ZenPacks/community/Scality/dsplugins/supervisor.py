@@ -101,7 +101,7 @@ class Supervisor(PythonDataSourcePlugin):
             'eventClassKey': 'SupervisorStatus',
             'summary': 'Supervisor - Status is {}'.format(comp_id, result['supv2_status']),
             'message': 'Supervisor - Status is {}'.format(comp_id, result['supv2_status']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Supervisor',
         })
 
         status_value = self.sup_status_values_maps.get(result['bizstoresup_status'], 3)
@@ -115,7 +115,7 @@ class Supervisor(PythonDataSourcePlugin):
             'eventClassKey': 'BizStoreStatus',
             'summary': 'Supervisor - Biz Store Status is {}'.format(comp_id, result['bizstoresup_status']),
             'message': 'Supervisor - Biz Store Status is {}'.format(comp_id, result['bizstoresup_status']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Supervisor',
         })
 
         return data

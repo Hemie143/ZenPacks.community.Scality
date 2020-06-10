@@ -102,10 +102,8 @@ class Volume(PythonDataSourcePlugin):
             'eventClassKey': 'VolumeStatus',
             'summary': 'Volume {} - Status is {}'.format(comp_id, volume_metrics['status']),
             'message': 'Volume {} - Status is {}'.format(comp_id, volume_metrics['status']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Volume',
         })
-
-        log.debug('AAA Node {} data: {}'.format(comp_id, data))
 
         return data
 

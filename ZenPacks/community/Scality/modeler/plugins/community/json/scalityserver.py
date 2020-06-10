@@ -65,11 +65,12 @@ class scalityserver(PythonPlugin):
         server_maps = []
         for server in servers:
             server_name = server['name']
+            server_ip = server['management_ip_address']
             om_server = ObjectMap()
-            om_server.id = self.prepId(server_name)
+            om_server.id = self.prepId(server_ip)
             om_server.title = server_name
             om_server.server_type = server['server_type']
-            om_server.ip_address = server['management_ip_address']
+            om_server.ip_address = server_ip
             om_server.zone = server['zone']
             # TODO: check usage of id in datasource
             om_server.server_id = server['id']
@@ -79,7 +80,7 @@ class scalityserver(PythonPlugin):
 
             server_maps.append(om_server)
 
-        rm.append(RelationshipMap(compname='',
+        rm.append(RelationshipMap(compname='scalitySupervisors/Supervisor',
                                   relname='scalityServers',
                                   modname='ZenPacks.community.Scality.ScalityServer',
                                   objmaps=server_maps))

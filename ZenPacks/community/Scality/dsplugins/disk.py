@@ -101,7 +101,7 @@ class Disk(PythonDataSourcePlugin):
             'eventClassKey': 'DiskStatus',
             'summary': 'Disk {} - State is {}'.format(comp_id, disk_metrics['status']),
             'message': 'Disk {} - State is {}'.format(comp_id, disk_metrics['status']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Disk',
         })
 
         state_value = max([self.state_value_maps.get(s, -1) for s in disk_metrics['state']])
@@ -115,7 +115,7 @@ class Disk(PythonDataSourcePlugin):
             'eventClassKey': 'DiskStatus',
             'summary': 'Disk {} - State is {}'.format(comp_id, disk_metrics['state']),
             'message': 'Disk {} - State is {}'.format(comp_id, disk_metrics['state']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Disk',
         })
 
         data['values'][comp_id]['disk_number_inodes'] = disk_metrics['number_inodes']
@@ -124,8 +124,6 @@ class Disk(PythonDataSourcePlugin):
         data['values'][comp_id]['disk_diskspace_stored'] = disk_metrics['diskspace_stored']
         data['values'][comp_id]['disk_diskspace_used_perc'] = disk_metrics['diskspace_used'] / \
                                                               disk_metrics['diskspace_total'] * 100
-
-        log.debug('AAA Node {} data: {}'.format(comp_id, data))
 
         return data
 

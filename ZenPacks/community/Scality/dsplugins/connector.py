@@ -111,7 +111,7 @@ class Connector(PythonDataSourcePlugin):
             'eventClassKey': 'ConnectorStatus',
             'summary': 'Connector {} - Status is {}'.format(comp_id, connector_metrics['status']),
             'message': 'Connector {} - Status is {}'.format(comp_id, connector_metrics['status']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Connector',
         })
 
         # State
@@ -128,7 +128,7 @@ class Connector(PythonDataSourcePlugin):
             'eventClassKey': 'ConnectorStatus',
             'summary': 'Connector {} - State is {}'.format(comp_id, connector_metrics['state']),
             'message': 'Connector {} - State is {}'.format(comp_id, connector_metrics['state']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Connector',
         })
 
         log.debug('AAA Node {} data: {}'.format(comp_id, data))

@@ -91,10 +91,8 @@ class S3Cluster(PythonDataSourcePlugin):
             'eventClassKey': 'S3ClusterStatus',
             'summary': 'S3 Cluster {} - Health is {}'.format(comp_id, cluster_metrics['cluster_health']),
             'message': 'S3 Cluster {} - Health is {}'.format(comp_id, cluster_metrics['cluster_health']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/S3Cluster',
         })
-
-        log.debug('AAA Node {} data: {}'.format(comp_id, data))
 
         return data
 

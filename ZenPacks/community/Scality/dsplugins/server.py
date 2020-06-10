@@ -105,7 +105,7 @@ class Server(PythonDataSourcePlugin):
             'eventClassKey': 'ServerStatus',
             'summary': 'Server {} - Status is {}'.format(comp_id, server_metrics['status']),
             'message': 'Server {} - Status is {}'.format(comp_id, server_metrics['status']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Server',
         })
 
         state_value = max([self.state_value_maps.get(s, 3) for s in server_metrics['state']])
@@ -119,7 +119,7 @@ class Server(PythonDataSourcePlugin):
             'eventClassKey': 'ServerStatus',
             'summary': 'Server {} - State is {}'.format(comp_id, server_metrics['state']),
             'message': 'Server {} - State is {}'.format(comp_id, server_metrics['state']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Server',
         })
 
         disk_critical = server_metrics['diskcount_status_critical']
@@ -143,11 +143,8 @@ class Server(PythonDataSourcePlugin):
             'eventClassKey': 'ServerDiskStatus',
             'summary': msg,
             'message': msg,
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Server',
         })
-
-
-        log.debug('AAA Server {} data: {}'.format(comp_id, data))
 
         return data
 

@@ -122,7 +122,7 @@ class Ring(PythonDataSourcePlugin):
             'eventClassKey': 'RingStatus',
             'summary': 'Ring {} - Status is {}'.format(comp_id, ring_metrics['status']),
             'message': 'Ring {} - Status is {}'.format(comp_id, ring_metrics['status']),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Ring',
         })
 
         # State
@@ -142,7 +142,7 @@ class Ring(PythonDataSourcePlugin):
             'eventClassKey': 'RingState',
             'summary': 'Ring {} - State is {}'.format(comp_id, ', '.join(ring_metrics['state'])),
             'message': 'Ring {} - State is {}'.format(comp_id, ', '.join(ring_metrics['state'])),
-            'eventClass': '/Status',
+            'eventClass': '/Status/Scality/Ring',
         })
         return data
 

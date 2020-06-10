@@ -80,11 +80,12 @@ class scalityconnector(PythonPlugin):
             om_connector.detached = connector['detached']
             om_connector.address = connector['address']
             om_connector.ring = connector['ring']
+            compname = 'scalitySupervisors/Supervisor/scalityRings/{}'.format(connector['ring'])
             connector_maps.append(om_connector)
 
-        rm.append(RelationshipMap(compname='',
-                                  relname='scalityConnectors',
-                                  modname='ZenPacks.community.Scality.ScalityConnector',
-                                  objmaps=connector_maps))
+            rm.append(RelationshipMap(compname=compname,
+                                      relname='scalityConnectors',
+                                      modname='ZenPacks.community.Scality.ScalityConnector',
+                                      objmaps=connector_maps))
 
         return rm

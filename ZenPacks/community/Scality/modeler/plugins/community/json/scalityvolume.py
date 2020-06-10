@@ -87,7 +87,7 @@ class scalityvolume(PythonPlugin):
             om_volume.meta_ring = volume['metadata_ring']
             volume_maps.append(om_volume)
 
-        rm.append(RelationshipMap(compname='',
+        rm.append(RelationshipMap(compname='scalitySupervisors/Supervisor',
                                   relname='scalityVolumes',
                                   modname='ZenPacks.community.Scality.ScalityVolume',
                                   objmaps=volume_maps))

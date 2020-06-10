@@ -69,22 +69,29 @@ class scalitynode(PythonPlugin):
         # log.debug('results: {}'.format(results))
 
         rm = []
-        node_maps = []
-        for node in results:
-            node_name = node['name']
-            om_node = ObjectMap()
-            om_node.id = self.prepId(node_name)
-            om_node.title = node_name
-            om_node.ring = node['ring']
-            # TODO: not safe
-            om_node.admin_endpoint = '{}:{}'.format(node['admin_address'], node['admin_port'])
-            om_node.chord_endpoint = '{}:{}'.format(node['chord_address'], node['chord_port'])
-            om_node.server_endpoint = node['server']
-            node_maps.append(om_node)
+        rings = {}
+        for entry in results:
+            ring_name = entry['ring']
+            if ring_name not in rings:
+                rings[ring_name] = []
+            rings[ring_name].append(entry)
 
-        rm.append(RelationshipMap(compname='',
-                                  relname='scalityNodes',
-                                  modname='ZenPacks.community.Scality.ScalityNode',
-                                  objmaps=node_maps))
-
+        for ring, nodes in rings.items():
+            compname = 'scalitySupervisors/Supervisor/scalityRings/{}'.format(ring)
+            node_maps = []
+            for node in nodes:
+                om_node = ObjectMap()
+                node_name = node['name']
+                om_node.id = self.prepId('{}_{}'.format(ring, node_name))
+                om_node.title = node_name
+                om_node.ring = ring
+                # TODO: not safe
+                om_node.admin_endpoint = '{}:{}'.format(node['admin_address'], node['admin_port'])
+                om_node.chord_endpoint = '{}:{}'.format(node['chord_address'], node['chord_port'])
+                om_node.server_endpoint = node['server']
+                node_maps.append(om_node)
+            rm.append(RelationshipMap(compname=compname,
+                                      relname='scalityNodes',
+                                      modname='ZenPacks.community.Scality.ScalityNode',
+                                      objmaps=node_maps))
         return rm

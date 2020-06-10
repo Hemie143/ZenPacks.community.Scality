@@ -67,24 +67,33 @@ class scalitydisk(PythonPlugin):
 
     def process(self, device, results, log):
         # log.debug('results: {}'.format(results))
+        servers = {}
+        for entry in results:
+            host_ip = entry['host']
+            if host_ip not in servers:
+                servers[host_ip] = []
+            servers[host_ip].append(entry)
 
         rm = []
-        disk_maps = []
-        for disk in results:
-            disk_id = disk['id']
-            om_disk = ObjectMap()
-            om_disk.id = self.prepId(disk_id)
-            om_disk.title = disk_id
-            om_disk.disk_id = disk_id
-            om_disk.host = disk['host']
-            om_disk.server_id = disk['server']
-            om_disk.fs_id = disk['fsid']
-            om_disk.rings = ', '.join(disk['rings'])
-            disk_maps.append(om_disk)
+        for server, disks in servers.items():
+            compname = 'scalitySupervisors/Supervisor/scalityServers/{}'.format(server)
+            disk_maps = []
 
-        rm.append(RelationshipMap(compname='',
-                                  relname='scalityDisks',
-                                  modname='ZenPacks.community.Scality.ScalityDisk',
-                                  objmaps=disk_maps))
+            for disk in disks:
+                disk_id = disk['id']
+                om_disk = ObjectMap()
+                om_disk.id = self.prepId(disk_id)
+                om_disk.title = disk_id
+                om_disk.disk_id = disk_id
+                om_disk.host = disk['host']
+                om_disk.server_id = disk['server']
+                om_disk.fs_id = disk['fsid']
+                om_disk.rings = ', '.join(disk['rings'])
+                disk_maps.append(om_disk)
+
+            rm.append(RelationshipMap(compname=compname,
+                                      relname='scalityDisks',
+                                      modname='ZenPacks.community.Scality.ScalityDisk',
+                                      objmaps=disk_maps))
 
         return rm

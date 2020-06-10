@@ -78,7 +78,7 @@ class scalitys3cluster(PythonPlugin):
             om_s3cluster.cluster_id = s3cluster['id']
             s3cluster_maps.append(om_s3cluster)
 
-        rm.append(RelationshipMap(compname='',
+        rm.append(RelationshipMap(compname='scalitySupervisors/Supervisor',
                                   relname='scalityS3Clusters',
                                   modname='ZenPacks.community.Scality.ScalityS3Cluster',
                                   objmaps=s3cluster_maps))
