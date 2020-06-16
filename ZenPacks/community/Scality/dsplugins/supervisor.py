@@ -55,7 +55,7 @@ class Supervisor(PythonDataSourcePlugin):
     @classmethod
     def params(cls, datasource, context):
         return {
-
+            'component_title': context.title
         }
 
     @inlineCallbacks
@@ -89,6 +89,7 @@ class Supervisor(PythonDataSourcePlugin):
 
         datasource = config.datasources[0]
         comp_id = datasource.component
+        comp_title = datasource.params['component_title']
 
         status_value = self.sup_status_values_maps.get(result['supv2_status'], 3)
         severity_value = self.sup_status_severity_maps.get(result['supv2_status'], 3)
@@ -99,8 +100,8 @@ class Supervisor(PythonDataSourcePlugin):
             'severity': severity_value,
             'eventKey': 'SupervisorStatus',
             'eventClassKey': 'SupervisorStatus',
-            'summary': 'Supervisor - Status is {}'.format(comp_id, result['supv2_status']),
-            'message': 'Supervisor - Status is {}'.format(comp_id, result['supv2_status']),
+            'summary': 'Supervisor - Status is {}'.format(comp_title, result['supv2_status']),
+            'message': 'Supervisor - Status is {}'.format(comp_title, result['supv2_status']),
             'eventClass': '/Status/Scality/Supervisor',
         })
 
@@ -113,8 +114,8 @@ class Supervisor(PythonDataSourcePlugin):
             'severity': severity_value,
             'eventKey': 'BizStoreStatus',
             'eventClassKey': 'BizStoreStatus',
-            'summary': 'Supervisor - Biz Store Status is {}'.format(comp_id, result['bizstoresup_status']),
-            'message': 'Supervisor - Biz Store Status is {}'.format(comp_id, result['bizstoresup_status']),
+            'summary': 'Supervisor - Biz Store Status is {}'.format(comp_title, result['bizstoresup_status']),
+            'message': 'Supervisor - Biz Store Status is {}'.format(comp_title, result['bizstoresup_status']),
             'eventClass': '/Status/Scality/Supervisor',
         })
 

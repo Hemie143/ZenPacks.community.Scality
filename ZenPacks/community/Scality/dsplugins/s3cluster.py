@@ -45,7 +45,8 @@ class S3Cluster(PythonDataSourcePlugin):
     @classmethod
     def params(cls, datasource, context):
         return {
-            'cluster_id': context.cluster_id
+            'cluster_id': context.cluster_id,
+            'component_title': context.title
         }
 
     @inlineCallbacks
@@ -79,6 +80,7 @@ class S3Cluster(PythonDataSourcePlugin):
 
         datasource = config.datasources[0]
         comp_id = datasource.component
+        comp_title = datasource.params['component_title']
         cluster_metrics = result['_items'][0]
 
         health_value = self.health_maps.get(cluster_metrics['cluster_health'], 3)
@@ -89,8 +91,8 @@ class S3Cluster(PythonDataSourcePlugin):
             'severity': health_value,
             'eventKey': 'S3ClusterStatus',
             'eventClassKey': 'S3ClusterStatus',
-            'summary': 'S3 Cluster {} - Health is {}'.format(comp_id, cluster_metrics['cluster_health']),
-            'message': 'S3 Cluster {} - Health is {}'.format(comp_id, cluster_metrics['cluster_health']),
+            'summary': 'S3 Cluster {} - Health is {}'.format(comp_title, cluster_metrics['cluster_health']),
+            'message': 'S3 Cluster {} - Health is {}'.format(comp_title, cluster_metrics['cluster_health']),
             'eventClass': '/Status/Scality/S3Cluster',
         })
 

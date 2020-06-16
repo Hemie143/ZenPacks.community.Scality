@@ -83,7 +83,7 @@ class scalitydisk(PythonPlugin):
                 disk_id = disk['id']
                 om_disk = ObjectMap()
                 om_disk.id = self.prepId(disk_id)
-                om_disk.title = disk_id
+                om_disk.title = '{} ({})'.format(disk['name'], server)
                 om_disk.disk_id = disk_id
                 om_disk.host = disk['host']
                 om_disk.server_id = disk['server']

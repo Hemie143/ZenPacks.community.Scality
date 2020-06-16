@@ -14,6 +14,8 @@ class ScalityConnector(schema.ScalityConnector):
         1: 'NEED RELOAD',
         2: 'CONFIG MISMATCH',
         3: 'DOWN/OFFLINE',
+        4: 'DOWN',
+        5: 'OFFLINE'
     }
 
     def get_status(self):

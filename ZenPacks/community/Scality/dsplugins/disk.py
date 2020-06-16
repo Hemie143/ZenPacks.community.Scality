@@ -55,7 +55,8 @@ class Disk(PythonDataSourcePlugin):
     @classmethod
     def params(cls, datasource, context):
         return {
-            'disk_id': context.disk_id
+            'disk_id': context.disk_id,
+            'component_title': context.title
         }
 
     @inlineCallbacks
@@ -89,6 +90,7 @@ class Disk(PythonDataSourcePlugin):
 
         datasource = config.datasources[0]
         comp_id = datasource.component
+        comp_title = datasource.params['component_title']
         disk_metrics = result['_items'][0]
 
         status_value = self.status_maps.get(disk_metrics['status'], 3)
@@ -99,8 +101,8 @@ class Disk(PythonDataSourcePlugin):
             'severity': status_value,
             'eventKey': 'DiskStatus',
             'eventClassKey': 'DiskStatus',
-            'summary': 'Disk {} - State is {}'.format(comp_id, disk_metrics['status']),
-            'message': 'Disk {} - State is {}'.format(comp_id, disk_metrics['status']),
+            'summary': 'Disk {} - State is {}'.format(comp_title, disk_metrics['status']),
+            'message': 'Disk {} - State is {}'.format(comp_title, disk_metrics['status']),
             'eventClass': '/Status/Scality/Disk',
         })
 
@@ -113,8 +115,8 @@ class Disk(PythonDataSourcePlugin):
             'severity': state_severity,
             'eventKey': 'DiskStatus',
             'eventClassKey': 'DiskStatus',
-            'summary': 'Disk {} - State is {}'.format(comp_id, disk_metrics['state']),
-            'message': 'Disk {} - State is {}'.format(comp_id, disk_metrics['state']),
+            'summary': 'Disk {} - State is {}'.format(comp_title, disk_metrics['state']),
+            'message': 'Disk {} - State is {}'.format(comp_title, disk_metrics['state']),
             'eventClass': '/Status/Scality/Disk',
         })
 
@@ -122,8 +124,8 @@ class Disk(PythonDataSourcePlugin):
         data['values'][comp_id]['disk_diskspace_total'] = disk_metrics['diskspace_total']
         data['values'][comp_id]['disk_diskspace_used'] = disk_metrics['diskspace_used']
         data['values'][comp_id]['disk_diskspace_stored'] = disk_metrics['diskspace_stored']
-        data['values'][comp_id]['disk_diskspace_used_perc'] = disk_metrics['diskspace_used'] / \
-                                                              disk_metrics['diskspace_total'] * 100
+        perc_used = round(100.0 * disk_metrics['diskspace_used'] / disk_metrics['diskspace_total'], 2)
+        data['values'][comp_id]['disk_diskspace_used_perc'] = perc_used
 
         return data
 

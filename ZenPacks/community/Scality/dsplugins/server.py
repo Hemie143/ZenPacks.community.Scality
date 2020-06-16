@@ -59,7 +59,8 @@ class Server(PythonDataSourcePlugin):
     @classmethod
     def params(cls, datasource, context):
         return {
-            'server_id': context.server_id
+            'server_id': context.server_id,
+            'component_title': context.title
         }
 
     @inlineCallbacks
@@ -93,6 +94,7 @@ class Server(PythonDataSourcePlugin):
 
         datasource = config.datasources[0]
         comp_id = datasource.component
+        comp_title = datasource.params['component_title']
         server_metrics = result['_items'][0]
 
         status_value = self.status_maps.get(server_metrics['status'], 3)
@@ -103,8 +105,8 @@ class Server(PythonDataSourcePlugin):
             'severity': status_value,
             'eventKey': 'ServerStatus',
             'eventClassKey': 'ServerStatus',
-            'summary': 'Server {} - Status is {}'.format(comp_id, server_metrics['status']),
-            'message': 'Server {} - Status is {}'.format(comp_id, server_metrics['status']),
+            'summary': 'Server {} - Status is {}'.format(comp_title, server_metrics['status']),
+            'message': 'Server {} - Status is {}'.format(comp_title, server_metrics['status']),
             'eventClass': '/Status/Scality/Server',
         })
 
@@ -117,8 +119,8 @@ class Server(PythonDataSourcePlugin):
             'severity': state_severity,
             'eventKey': 'ServerStatus',
             'eventClassKey': 'ServerStatus',
-            'summary': 'Server {} - State is {}'.format(comp_id, server_metrics['state']),
-            'message': 'Server {} - State is {}'.format(comp_id, server_metrics['state']),
+            'summary': 'Server {} - State is {}'.format(comp_title, server_metrics['state']),
+            'message': 'Server {} - State is {}'.format(comp_title, server_metrics['state']),
             'eventClass': '/Status/Scality/Server',
         })
 

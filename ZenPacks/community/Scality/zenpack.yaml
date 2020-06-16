@@ -16,6 +16,15 @@ classes:
     base: [zenpacklib.Component]
     label: Scality Supervisor
     monitoring_templates: [ScalitySupervisor]
+    relationships:
+      scalityS3Clusters:
+        label: S3 Clusters
+      scalityVolumes:
+        label: Volumes
+      scalityRings:
+        label: Rings
+      scalityServers:
+        label: Servers
     properties:
       get_supv2_status:
         label: Status
@@ -37,10 +46,143 @@ classes:
         label: Complete Version
         grid_display: false
 
+  ScalityConnector:
+    base: [zenpacklib.Component]
+    label: Scality Connector
+    monitoring_templates: [ScalityConnector]
+    relationships:
+      DEFAULTS:
+        grid_display: false
+      scalityRing:
+        grid_display: true
+        label: Ring
+        content_width: 80
+    properties:
+      get_status:
+        label: Status
+        api_only: true
+        api_backendtype: method
+        grid_display: true
+        label_width: 60
+      get_state:
+        label: State
+        api_only: true
+        api_backendtype: method
+        grid_display: true
+        label_width: 100
+      protocol:
+        label: Protocol
+        grid_display: true
+      detached:
+        label: Detached
+        grid_display: true
+      address:
+        label: Address
+        grid_display: true
+      connector_id:
+        label: ID
+        grid_display: false
+      ring:
+        label: RING
+        grid_display: false
+
+  ScalityDisk:
+    base: [zenpacklib.Component]
+    label: Scality Disk
+    monitoring_templates: [ScalityDisk]
+    relationships:
+      DEFAULTS:
+        grid_display: false
+      scalityServer:
+        grid_display: true
+        label: Server
+        label_width: 100
+    properties:
+      get_status:
+        label: Status
+        api_only: true
+        api_backendtype: method
+        grid_display: true
+        label_width: 60
+      get_state:
+        label: State
+        api_only: true
+        api_backendtype: method
+        grid_display: true
+        label_width: 60
+      disk_id:
+        label: Disk ID
+        grid_display: false
+      host:
+        label: Host
+        grid_display: false
+      server_id:
+        label: Server ID
+        grid_display: false
+      fs_id:
+        label: Filesystem ID
+        grid_display: false
+      rings:
+        label: Rings
+        grid_display: false
+
+  ScalityNode:
+    base: [zenpacklib.Component]
+    label: Scality Node
+    monitoring_templates: [ScalityNode]
+    relationships:
+      DEFAULTS:
+        grid_display: false
+      scalityRing:
+        grid_display: true
+        label: Ring
+        content_width: 80
+    properties:
+      get_state:
+        label: State
+        api_only: true
+        api_backendtype: method
+        grid_display: true
+        label_width: 60
+      reachable:
+        label: Reachable
+        grid_display: true
+        datapoint: node_reachable
+        renderer: Zenoss.render.severity
+      conf_mismatch:
+        label: Configuration
+        grid_display: true
+        datapoint: node_conf_mismatch
+        renderer: Zenoss.render.severity
+      tasks_blocked:
+        label: Stuck tasks
+        grid_display: true
+        datapoint: node_tasks_blocked
+        renderer: Zenoss.render.severity
+      ring:
+        label: Ring
+        grid_display: false
+      admin_endpoint:
+        label: Admin Endpoint
+        grid_display: false
+      chord_endpoint:
+        label: CHORD Endpoint
+        grid_display: false
+      server_endpoint:
+        label: Sagentd Endpoint
+        grid_display: false
+
   ScalityRing:
     base: [zenpacklib.Component]
     label: Scality Ring
     monitoring_templates: [ScalityRing]
+    relationships:
+      scalitySupervisor:
+        grid_display: false
+      scalityNodes:
+        label: Nodes
+      scalityConnectors:
+        label: Connectors
     properties:
       DEFAULTS:
         grid_display: false
@@ -64,6 +206,24 @@ classes:
         label: Planning period (days)
         grid_display: false
 
+  ScalityS3Cluster:
+    base: [zenpacklib.Component]
+    label: Scality S3 Cluster
+    monitoring_templates: [ScalityS3Cluster]
+    relationships:
+      scalitySupervisor:
+        grid_display: false
+    properties:
+      get_cluster_health:
+        label: Cluster Health
+        api_only: true
+        api_backendtype: method
+        grid_display: true
+        label_width: 60
+      cluster_id:
+        label: Cluster ID
+        grid_display: false
+
   ScalityServer:
     base: [zenpacklib.Component]
     label: Scality Server
@@ -71,6 +231,8 @@ classes:
     relationships:
       scalitySupervisor:
         grid_display: false
+      scalityDisks:
+        label: Disks
     properties:
       ip_address:
         label: IP Address
@@ -113,97 +275,13 @@ classes:
         label: Roles
         grid_display: false
 
-  ScalityNode:
-    base: [zenpacklib.Component]
-    label: Scality Node
-    monitoring_templates: [ScalityNode]
-    properties:
-      get_state:
-        label: State
-        api_only: true
-        api_backendtype: method
-        grid_display: true
-        label_width: 60
-      reachable:
-        label: Reachable
-        grid_display: true
-        datapoint: node_reachable
-        renderer: Zenoss.render.severity
-      conf_mismatch:
-        label: Configuration
-        grid_display: true
-        datapoint: node_conf_mismatch
-        renderer: Zenoss.render.severity
-      tasks_blocked:
-        label: Stuck tasks
-        grid_display: true
-        datapoint: node_tasks_blocked
-        renderer: Zenoss.render.severity
-      ring:
-        label: Ring
-        grid_display: true
-      admin_endpoint:
-        label: Admin Endpoint
-        grid_display: false
-      chord_endpoint:
-        label: CHORD Endpoint
-        grid_display: false
-      server_endpoint:
-        label: Sagentd Endpoint
-        grid_display: false
-
-  ScalityS3Cluster:
-    base: [zenpacklib.Component]
-    label: Scality S3 Cluster
-    monitoring_templates: [ScalityS3Cluster]
-    properties:
-      get_cluster_health:
-        label: Cluster Health
-        api_only: true
-        api_backendtype: method
-        grid_display: true
-        label_width: 60
-      cluster_id:
-        label: Cluster ID
-        grid_display: false
-
-  ScalityDisk:
-    base: [zenpacklib.Component]
-    label: Scality Disk
-    monitoring_templates: [ScalityDisk]
-    properties:
-      get_status:
-        label: Status
-        api_only: true
-        api_backendtype: method
-        grid_display: true
-        label_width: 60
-      get_state:
-        label: State
-        api_only: true
-        api_backendtype: method
-        grid_display: true
-        label_width: 60
-      disk_id:
-        label: Disk ID
-        grid_display: false
-      host:
-        label: Host
-        grid_display: false
-      server_id:
-        label: Server ID
-        grid_display: false
-      fs_id:
-        label: Filesystem ID
-        grid_display: false
-      rings:
-        label: Rings
-        grid_display: false
-
   ScalityVolume:
     base: [zenpacklib.Component]
     label: Scality Volume
     monitoring_templates: [ScalityVolume]
+    relationships:
+      scalitySupervisor:
+        grid_display: false
     properties:
       get_status:
         label: Status
@@ -226,39 +304,6 @@ classes:
       meta_ring:
         label: Meta RING
         grid_display: false
-
-  ScalityConnector:
-    base: [zenpacklib.Component]
-    label: Scality Connector
-    monitoring_templates: [ScalityConnector]
-    properties:
-      get_status:
-        label: Status
-        api_only: true
-        api_backendtype: method
-        grid_display: true
-        label_width: 60
-      get_state:
-        label: State
-        api_only: true
-        api_backendtype: method
-        grid_display: true
-        label_width: 60
-      protocol:
-        label: Protocol
-        grid_display: true
-      detached:
-        label: Detached
-        grid_display: true
-      address:
-        label: Address
-        grid_display: true
-      connector_id:
-        label: ID
-        grid_display: false
-      ring:
-        label: RING
-        grid_display: true
 
 class_relationships:
   - Products.ZenModel.Device.Device 1:MC ScalitySupervisor

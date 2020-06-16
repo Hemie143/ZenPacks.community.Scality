@@ -55,7 +55,8 @@ class Volume(PythonDataSourcePlugin):
     @classmethod
     def params(cls, datasource, context):
         return {
-            'volume_id': context.volume_id
+            'volume_id': context.volume_id,
+            'component_title': context.title
         }
 
     @inlineCallbacks
@@ -89,6 +90,7 @@ class Volume(PythonDataSourcePlugin):
 
         datasource = config.datasources[0]
         comp_id = datasource.component
+        comp_title = datasource.params['component_title']
         volume_metrics = result['_items'][0]
 
         status_value = self.status_value_maps.get(volume_metrics['status'], 3)
@@ -100,8 +102,8 @@ class Volume(PythonDataSourcePlugin):
             'severity': status_severity,
             'eventKey': 'VolumeStatus',
             'eventClassKey': 'VolumeStatus',
-            'summary': 'Volume {} - Status is {}'.format(comp_id, volume_metrics['status']),
-            'message': 'Volume {} - Status is {}'.format(comp_id, volume_metrics['status']),
+            'summary': 'Volume {} - Status is {}'.format(comp_title, volume_metrics['status']),
+            'message': 'Volume {} - Status is {}'.format(comp_title, volume_metrics['status']),
             'eventClass': '/Status/Scality/Volume',
         })
 

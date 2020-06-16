@@ -45,7 +45,8 @@ class Node(PythonDataSourcePlugin):
     @classmethod
     def params(cls, datasource, context):
         return {
-            'storenode_id': context.admin_endpoint
+            'storenode_id': context.admin_endpoint,
+            'component_title': context.title
         }
 
     @inlineCallbacks
@@ -79,6 +80,7 @@ class Node(PythonDataSourcePlugin):
 
         datasource = config.datasources[0]
         comp_id = datasource.component
+        comp_title = datasource.params['component_title']
         node_metrics = result['_items'][0]
 
         state_value = self.state_maps.get(node_metrics['state'], 3)
@@ -89,8 +91,8 @@ class Node(PythonDataSourcePlugin):
             'severity': state_value,
             'eventKey': 'NodeStatus',
             'eventClassKey': 'NodeStatus',
-            'summary': 'Node {} - State is {}'.format(comp_id, node_metrics['state']),
-            'message': 'Node {} - State is {}'.format(comp_id, node_metrics['state']),
+            'summary': 'Node {} - State is {}'.format(comp_title, node_metrics['state']),
+            'message': 'Node {} - State is {}'.format(comp_title, node_metrics['state']),
             'eventClass': '/Status/Scality/Node',
         })
 

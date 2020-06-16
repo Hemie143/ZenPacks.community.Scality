@@ -33,11 +33,11 @@ class Connector(PythonDataSourcePlugin):
 
     state_value_maps = {
         'OK': 0,
-        'NEED RELOAD': 1,
+        'NEED_RELOAD': 1,
         'CONFIG MISMATCH': 2,
         'DOWN/OFFLINE': 3,
-        'DOWN': 3,
-        'OFFLINE': 3,
+        'DOWN': 4,
+        'OFFLINE': 5,
     }
 
     state_severity_maps = {
@@ -65,7 +65,8 @@ class Connector(PythonDataSourcePlugin):
     @classmethod
     def params(cls, datasource, context):
         return {
-            'connector_id': context.connector_id
+            'connector_id': context.connector_id,
+            'component_title': context.title
         }
 
     @inlineCallbacks
@@ -99,6 +100,7 @@ class Connector(PythonDataSourcePlugin):
 
         datasource = config.datasources[0]
         comp_id = datasource.component
+        comp_title = datasource.params['component_title']
         connector_metrics = result['_items'][0]
 
         status_value = self.status_maps.get(connector_metrics['status'], 3)
@@ -109,15 +111,13 @@ class Connector(PythonDataSourcePlugin):
             'severity': status_value,
             'eventKey': 'ConnectorStatus',
             'eventClassKey': 'ConnectorStatus',
-            'summary': 'Connector {} - Status is {}'.format(comp_id, connector_metrics['status']),
-            'message': 'Connector {} - Status is {}'.format(comp_id, connector_metrics['status']),
+            'summary': 'Connector {} - Status is {}'.format(comp_title, connector_metrics['status']),
+            'message': 'Connector {} - Status is {}'.format(comp_title, connector_metrics['status']),
             'eventClass': '/Status/Scality/Connector',
         })
 
         # State
-        log.debug('AAA state: {}'.format(connector_metrics['state']))
         state_value = max([self.state_value_maps.get(s, -1) for s in connector_metrics['state']])
-        log.debug('AAA state_value: {}'.format(state_value))
         state_severity = max([self.state_severity_maps.get(s, -1) for s in connector_metrics['state']])
         data['values'][comp_id]['connector_state'] = state_value
         data['events'].append({
@@ -126,12 +126,10 @@ class Connector(PythonDataSourcePlugin):
             'severity': state_severity,
             'eventKey': 'ConnectorStatus',
             'eventClassKey': 'ConnectorStatus',
-            'summary': 'Connector {} - State is {}'.format(comp_id, connector_metrics['state']),
-            'message': 'Connector {} - State is {}'.format(comp_id, connector_metrics['state']),
+            'summary': 'Connector {} - State is {}'.format(comp_title, ','.join(s for s in connector_metrics['state'])),
+            'message': 'Connector {} - State is {}'.format(comp_title, ','.join(s for s in connector_metrics['state'])),
             'eventClass': '/Status/Scality/Connector',
         })
-
-        log.debug('AAA Node {} data: {}'.format(comp_id, data))
 
         return data
 

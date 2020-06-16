@@ -100,6 +100,7 @@ class Ring(PythonDataSourcePlugin):
 
         datasource = config.datasources[0]
         comp_id = datasource.component
+        comp_title = datasource.params['component_title']
         ring_metrics = result['_items'][0]
 
         for dp_id, dp_name in [(x.id, x.dpName) for x in datasource.points]:
@@ -108,8 +109,13 @@ class Ring(PythonDataSourcePlugin):
             data['values'][comp_id][dp_name] = (ring_metrics[dp_id], 'N')
 
         # Forecast
-        data['values'][comp_id]['ring_planning_growth_month'] = ring_metrics['planning_usage_growth'] / \
-                                                                ring_metrics['planning_used_capacity_age'] * 30
+        usage_growth = ring_metrics['planning_usage_growth']
+        planning_age = ring_metrics['planning_used_capacity_age']
+        if planning_age == 0:
+            growth_month = 0
+        else:
+            growth_month = 30.0 * usage_growth / planning_age
+        data['values'][comp_id]['ring_planning_growth_month'] = growth_month
 
         # Status
         status_value = self.status_maps.get(ring_metrics['status'], 3)
@@ -120,8 +126,8 @@ class Ring(PythonDataSourcePlugin):
             'severity': status_value,
             'eventKey': 'RingStatus',
             'eventClassKey': 'RingStatus',
-            'summary': 'Ring {} - Status is {}'.format(comp_id, ring_metrics['status']),
-            'message': 'Ring {} - Status is {}'.format(comp_id, ring_metrics['status']),
+            'summary': 'Ring {} - Status is {}'.format(comp_title, ring_metrics['status']),
+            'message': 'Ring {} - Status is {}'.format(comp_title, ring_metrics['status']),
             'eventClass': '/Status/Scality/Ring',
         })
 
@@ -140,8 +146,8 @@ class Ring(PythonDataSourcePlugin):
             'severity': state_severity_value,
             'eventKey': 'RingState',
             'eventClassKey': 'RingState',
-            'summary': 'Ring {} - State is {}'.format(comp_id, ', '.join(ring_metrics['state'])),
-            'message': 'Ring {} - State is {}'.format(comp_id, ', '.join(ring_metrics['state'])),
+            'summary': 'Ring {} - State is {}'.format(comp_title, ', '.join(ring_metrics['state'])),
+            'message': 'Ring {} - State is {}'.format(comp_title, ', '.join(ring_metrics['state'])),
             'eventClass': '/Status/Scality/Ring',
         })
         return data
