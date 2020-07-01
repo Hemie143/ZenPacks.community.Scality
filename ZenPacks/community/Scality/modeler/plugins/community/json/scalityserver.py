@@ -84,5 +84,5 @@ class scalityserver(PythonPlugin):
                                   relname='scalityServers',
                                   modname='ZenPacks.community.Scality.ScalityServer',
                                   objmaps=server_maps))
-
+        log.debug('AAAA Server')
         return rm

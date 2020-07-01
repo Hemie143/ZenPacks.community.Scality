@@ -66,7 +66,6 @@ class scalitynode(PythonPlugin):
         returnValue(nodes)
 
     def process(self, device, results, log):
-        # log.debug('results: {}'.format(results))
 
         rm = []
         rings = {}
@@ -94,4 +93,5 @@ class scalitynode(PythonPlugin):
                                       relname='scalityNodes',
                                       modname='ZenPacks.community.Scality.ScalityNode',
                                       objmaps=node_maps))
+        log.debug('AAAA Node')
         return rm

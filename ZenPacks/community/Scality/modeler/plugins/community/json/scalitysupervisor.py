@@ -64,7 +64,6 @@ class scalitysupervisor(PythonPlugin):
 
     def process(self, device, results, log):
         log.debug('results: {}'.format(results))
-
         rm = []
         sup_maps = []
 
@@ -79,4 +78,8 @@ class scalitysupervisor(PythonPlugin):
                                   relname='scalitySupervisors',
                                   modname='ZenPacks.community.Scality.ScalitySupervisor',
                                   objmaps=sup_maps))
+
+        log.debug('Supervisor rm: {}'.format(rm))
+        log.debug('AAAA Supervisor')
+
         return rm

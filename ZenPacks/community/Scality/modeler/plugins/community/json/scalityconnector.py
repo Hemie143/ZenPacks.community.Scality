@@ -66,26 +66,36 @@ class scalityconnector(PythonPlugin):
         returnValue(connectors)
 
     def process(self, device, results, log):
-        # log.debug('results: {}'.format(results))
+
+        rings = {}
+        for entry in results:
+            ring = entry['ring']
+            if ring not in rings:
+                rings[ring] = []
+            rings[ring].append(entry)
 
         rm = []
-        connector_maps = []
-        for connector in results:
-            volume_id = connector['id']
-            om_connector = ObjectMap()
-            om_connector.id = self.prepId(volume_id)
-            om_connector.title = connector['name']
-            om_connector.connector_id = volume_id
-            om_connector.protocol = connector['protocol']
-            om_connector.detached = connector['detached']
-            om_connector.address = connector['address']
-            om_connector.ring = connector['ring']
-            compname = 'scalitySupervisors/Supervisor/scalityRings/{}'.format(connector['ring'])
-            connector_maps.append(om_connector)
+        for ring, connectors in rings.items():
+            compname = 'scalitySupervisors/Supervisor/scalityRings/{}'.format(ring)
+            connector_maps = []
+
+            for connector in connectors:
+                volume_id = connector['id']
+                om_connector = ObjectMap()
+                om_connector.id = self.prepId(volume_id)
+                om_connector.title = connector['name']
+                om_connector.connector_id = volume_id
+                om_connector.protocol = connector['protocol']
+                om_connector.detached = connector['detached']
+                om_connector.address = connector['address']
+                om_connector.ring = connector['ring']
+                connector_maps.append(om_connector)
 
             rm.append(RelationshipMap(compname=compname,
                                       relname='scalityConnectors',
                                       modname='ZenPacks.community.Scality.ScalityConnector',
                                       objmaps=connector_maps))
 
+        log.debug('Connector rm: {}'.format(rm))
+        log.debug('AAAA Connector')
         return rm

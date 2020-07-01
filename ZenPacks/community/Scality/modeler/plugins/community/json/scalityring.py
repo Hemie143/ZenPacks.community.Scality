@@ -49,12 +49,8 @@ class scalityring(PythonPlugin):
             # TODO: check valid HTTP code and presence of _items in output
             scheme = 'https' if zScalityUseSSL else 'http'
             url = '{}://{}/api/v0.1/rings/'.format(scheme, device.id)
-            log.debug('AAA - url: {}'.format(url))
             response = yield agent.request('GET', url, Headers(headers))
-            log.debug('AAA - response: {}'.format(response))
-            log.debug('AAA - response code: {}'.format(response.code))
             response_body = yield readBody(response)
-            log.debug('AAA - response_body: {}'.format(response_body))
             response_body = json.loads(response_body)
 
         except Exception, e:
@@ -81,4 +77,5 @@ class scalityring(PythonPlugin):
                                   relname='scalityRings',
                                   modname='ZenPacks.community.Scality.ScalityRing',
                                   objmaps=ring_maps))
+        log.debug('AAAA Ring')
         return rm

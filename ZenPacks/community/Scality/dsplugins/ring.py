@@ -65,7 +65,8 @@ class Ring(PythonDataSourcePlugin):
     @classmethod
     def params(cls, datasource, context):
         return {
-            'ring_name': context.title
+            'ring_name': context.title,
+            'component_title': context.title
         }
 
     @inlineCallbacks
@@ -75,7 +76,6 @@ class Ring(PythonDataSourcePlugin):
         ds0 = config.datasources[0]
         scheme = 'https' if ds0.zScalityUseSSL else 'http'
         url = '{}://{}/api/v0.1/rings/{}/'.format(scheme, config.id, ds0.params['ring_name'])
-        # log.debug('AAA : url : {}'.format(url))
         basicAuth = base64.encodestring('{}:{}'.format(ds0.zScalityUsername, ds0.zScalityPassword))
         authHeader = "Basic " + basicAuth.strip()
 
@@ -132,8 +132,6 @@ class Ring(PythonDataSourcePlugin):
         })
 
         # State
-        # log.debug('AAA : state: {}'.format(ring_metrics['state']))
-        # log.debug('AAA : state: {}'.format(type(ring_metrics['state'])))
         if ring_metrics['state'] == ["RUN"]:
             state_severity_value = 0
         else:

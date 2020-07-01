@@ -83,4 +83,6 @@ class scalitys3cluster(PythonPlugin):
                                   modname='ZenPacks.community.Scality.ScalityS3Cluster',
                                   objmaps=s3cluster_maps))
 
+        log.debug('AAAA S3 Cluster')
+
         return rm

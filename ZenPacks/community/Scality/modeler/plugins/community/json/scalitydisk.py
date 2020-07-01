@@ -66,7 +66,7 @@ class scalitydisk(PythonPlugin):
         returnValue(disks)
 
     def process(self, device, results, log):
-        # log.debug('results: {}'.format(results))
+
         servers = {}
         for entry in results:
             host_ip = entry['host']
@@ -95,5 +95,5 @@ class scalitydisk(PythonPlugin):
                                       relname='scalityDisks',
                                       modname='ZenPacks.community.Scality.ScalityDisk',
                                       objmaps=disk_maps))
-
+        log.debug('AAAA Disk')
         return rm

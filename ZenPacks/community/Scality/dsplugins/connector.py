@@ -42,7 +42,7 @@ class Connector(PythonDataSourcePlugin):
 
     state_severity_maps = {
         'OK': 0,
-        'NEED RELOAD': 3,
+        'NEED_RELOAD': 3,
         'CONFIG MISMATCH': 3,
         'DOWN/OFFLINE': 5,
         'DOWN': 5,
@@ -130,6 +130,9 @@ class Connector(PythonDataSourcePlugin):
             'message': 'Connector {} - State is {}'.format(comp_title, ','.join(s for s in connector_metrics['state'])),
             'eventClass': '/Status/Scality/Connector',
         })
+
+
+        log.debug('data: {}'.format(data))
 
         return data
 

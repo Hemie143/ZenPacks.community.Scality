@@ -71,7 +71,7 @@ class scalityvolume(PythonPlugin):
         returnValue(volumes)
 
     def process(self, device, results, log):
-        # log.debug('results: {}'.format(results))
+        log.debug('results: {}'.format(results))
 
         rm = []
         volume_maps = []
@@ -91,5 +91,5 @@ class scalityvolume(PythonPlugin):
                                   relname='scalityVolumes',
                                   modname='ZenPacks.community.Scality.ScalityVolume',
                                   objmaps=volume_maps))
-
+        log.debug('AAAA Volume')
         return rm

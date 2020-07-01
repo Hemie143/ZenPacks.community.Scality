@@ -69,7 +69,7 @@ classes:
         api_only: true
         api_backendtype: method
         grid_display: true
-        label_width: 100
+        label_width: 120
       protocol:
         label: Protocol
         grid_display: true
@@ -552,14 +552,6 @@ device_classes:
               diskspace_used_perc:
                 rrdtype: GAUGE
         graphs:
-          inodes:
-            units: inodes
-            miny: 0
-            graphpoints:
-              inodes:
-                lineType: AREA
-                dpName: disk_number_inodes
-                sequence: 1
           Diskspace:
             units: bytes
             miny: 0
@@ -584,6 +576,14 @@ device_classes:
             graphpoints:
               Diskspace Used Capacity:
                 dpName: disk_diskspace_used_perc
+                sequence: 1
+          inodes:
+            units: inodes
+            miny: 0
+            graphpoints:
+              inodes:
+                lineType: AREA
+                dpName: disk_number_inodes
                 sequence: 1
 
       ScalityVolume:
