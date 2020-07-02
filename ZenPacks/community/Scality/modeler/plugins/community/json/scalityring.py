@@ -67,13 +67,13 @@ class scalityring(PythonPlugin):
             'connectors': '{}://{}/api/v0.1/volume_connectors/?offset={}&limit={}',
         }
 
-        for item, url in queries.items():
+        for item, base_url in queries.items():
             try:
                 data = []
                 offset = 0
                 limit = 20
                 while True:
-                    url = url.format(scheme, device.id, offset, limit)
+                    url = base_url.format(scheme, device.id, offset, limit)
                     response = yield agent.request('GET', url, Headers(headers))
                     response_body = yield readBody(response)
                     response_body = json.loads(response_body)
@@ -201,12 +201,17 @@ class scalityring(PythonPlugin):
 
     def model_disks(self, results, log):
         log.debug('model_disks data: {}'.format(results))
+
+        log.debug('ZZZ disks results: {}'.format(len(results)))
+
         servers = {}
         for entry in results:
             host_ip = entry['host']
             if host_ip not in servers:
                 servers[host_ip] = []
             servers[host_ip].append(entry)
+
+        log.debug('ZZZ servers: {}'.format(servers.keys()))
 
         rm = []
         for server, disks in servers.items():
@@ -215,6 +220,9 @@ class scalityring(PythonPlugin):
 
             for disk in disks:
                 disk_id = disk['id']
+
+                log.debug('ZZZ disk: {} - {} - {} - {} - {}'.format(disk['name'], server, disk['host'], disk['server'], disk_id))
+
                 om_disk = ObjectMap()
                 om_disk.id = self.prepId(disk_id)
                 om_disk.title = '{} ({})'.format(disk['name'], server)
