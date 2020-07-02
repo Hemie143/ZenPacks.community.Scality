@@ -202,8 +202,6 @@ class scalityring(PythonPlugin):
     def model_disks(self, results, log):
         log.debug('model_disks data: {}'.format(results))
 
-        log.debug('ZZZ disks results: {}'.format(len(results)))
-
         servers = {}
         for entry in results:
             host_ip = entry['host']
@@ -211,18 +209,12 @@ class scalityring(PythonPlugin):
                 servers[host_ip] = []
             servers[host_ip].append(entry)
 
-        log.debug('ZZZ servers: {}'.format(servers.keys()))
-
         rm = []
         for server, disks in servers.items():
             compname = 'scalitySupervisors/Supervisor/scalityServers/{}'.format(server)
             disk_maps = []
-
             for disk in disks:
                 disk_id = disk['id']
-
-                log.debug('ZZZ disk: {} - {} - {} - {} - {}'.format(disk['name'], server, disk['host'], disk['server'], disk_id))
-
                 om_disk = ObjectMap()
                 om_disk.id = self.prepId(disk_id)
                 om_disk.title = '{} ({})'.format(disk['name'], server)
