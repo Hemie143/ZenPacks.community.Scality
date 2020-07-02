@@ -333,14 +333,7 @@ device_classes:
         - zenoss.cmd.linux.sudo_dmidecode
         - zenoss.cmd.linux.os_release
         - zenoss.cmd.linux.os_service
-        - community.json.scalitysupervisor
-        - community.json.scalitys3cluster
-        - community.json.scalityserver
-        - community.json.scalityvolume
         - community.json.scalityring
-        - community.json.scalitydisk
-        - community.json.scalitynode
-        - community.json.scalityconnector
 
     templates:
       ScalitySupervisor:
