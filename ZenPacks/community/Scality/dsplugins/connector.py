@@ -1,21 +1,30 @@
 import json
 import logging
 import base64
-import re
 
 # Twisted Imports
-from twisted.internet import reactor
-from twisted.internet.defer import returnValue, DeferredSemaphore, DeferredList, inlineCallbacks
-from twisted.web.client import getPage, Agent, readBody
+from twisted.internet import reactor, ssl
+from twisted.internet.defer import returnValue, inlineCallbacks
+from twisted.web.client import Agent, readBody, BrowserLikePolicyForHTTPS
 from twisted.web.http_headers import Headers
-from twisted.internet.error import TimeoutError
+from twisted.web.iweb import IPolicyForHTTPS
 
 # Zenoss imports
 from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonDataSourcePlugin
-from Products.ZenUtils.Utils import prepId
+from zope.interface import implementer
 
 # Setup logging
 log = logging.getLogger('zen.ScalityConnector')
+
+
+# TODO: Move this factory in a library
+@implementer(IPolicyForHTTPS)
+class SkipCertifContextFactory(object):
+    def __init__(self):
+        self.default_policy = BrowserLikePolicyForHTTPS()
+
+    def creatorForNetloc(self, hostname, port):
+        return ssl.CertificateOptions(verify=False)
 
 
 class Connector(PythonDataSourcePlugin):
@@ -79,7 +88,7 @@ class Connector(PythonDataSourcePlugin):
         basicAuth = base64.encodestring('{}:{}'.format(ds0.zScalityUsername, ds0.zScalityPassword))
         authHeader = "Basic " + basicAuth.strip()
 
-        agent = Agent(reactor)
+        agent = Agent(reactor, contextFactory=SkipCertifContextFactory())
         headers = {
             "Accept": ['application/json'],
             "Authorization": [authHeader],
