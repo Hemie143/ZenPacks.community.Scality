@@ -4,14 +4,24 @@ import base64
 
 # Twisted Imports
 from twisted.internet.defer import inlineCallbacks, returnValue
-from twisted.web.client import Agent, readBody
-from twisted.internet import reactor
+from twisted.web.client import Agent, readBody, BrowserLikePolicyForHTTPS
+from twisted.internet import reactor, ssl
 from twisted.web.http_headers import Headers
+from twisted.web.iweb import IPolicyForHTTPS
 
 # Zenoss Imports
 from Products.DataCollector.plugins.CollectorPlugin import PythonPlugin
 from Products.DataCollector.plugins.DataMaps import ObjectMap, RelationshipMap
+from zope.interface import implementer
 
+
+@implementer(IPolicyForHTTPS)
+class SkipCertifContextFactory(object):
+    def __init__(self):
+        self.default_policy = BrowserLikePolicyForHTTPS()
+
+    def creatorForNetloc(self, hostname, port):
+        return ssl.CertificateOptions(verify=False)
 
 class scalityring(PythonPlugin):
 
@@ -39,7 +49,7 @@ class scalityring(PythonPlugin):
         scheme = 'https' if zScalityUseSSL else 'http'
 
         results = {}
-        agent = Agent(reactor)
+        agent = Agent(reactor, contextFactory=SkipCertifContextFactory())
         headers = {
                    "Accept": ['application/json'],
                    "Authorization": [authHeader],
@@ -51,7 +61,6 @@ class scalityring(PythonPlugin):
             response = yield agent.request('GET', url, Headers(headers))
             response_body = yield readBody(response)
             response_body = json.loads(response_body)
-            # results.append(dict([(item, response_body)]))
             results['supervisor'] = response_body
         except Exception, e:
             log.error('%s: %s', device.id, e)
