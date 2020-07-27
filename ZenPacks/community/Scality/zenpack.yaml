@@ -119,6 +119,12 @@ classes:
       server_id:
         label: Server ID
         grid_display: false
+      server_name:
+        label: Server Hostname
+        grid_display: false
+      server_ip:
+        label: Server IP Address
+        grid_display: false
       fs_id:
         label: Filesystem ID
         grid_display: false

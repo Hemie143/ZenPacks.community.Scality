@@ -112,7 +112,7 @@ class scalityring(PythonPlugin):
             if 'rings' in results:
                 rm.append(self.model_rings(results['rings'], log))
             if 'disks' in results:
-                rm.extend(self.model_disks(results['disks'], log))
+                rm.extend(self.model_disks(results['disks'], results['servers'], log))
             if 'nodes' in results:
                 rm.extend(self.model_nodes(results['nodes'], log))
             if 'connectors' in results:
@@ -154,6 +154,7 @@ class scalityring(PythonPlugin):
             server_name = server['name']
             server_ip = server['management_ip_address']
             om_server = ObjectMap()
+            # TODO: Use something else than IP address to ID the server
             om_server.id = self.prepId(server_ip)
             om_server.title = server_name
             om_server.server_type = server['server_type']
@@ -208,8 +209,10 @@ class scalityring(PythonPlugin):
                                modname='ZenPacks.community.Scality.ScalityRing',
                                objmaps=ring_maps)
 
-    def model_disks(self, results, log):
+    def model_disks(self, results, servers_data, log):
         log.debug('model_disks data: {}'.format(results))
+
+        log.debug('ABC: servers_data: {}'.format(len(servers_data)))
 
         servers = {}
         for entry in results:
@@ -219,17 +222,25 @@ class scalityring(PythonPlugin):
             servers[host_ip].append(entry)
 
         rm = []
-        for server, disks in servers.items():
-            compname = 'scalitySupervisors/Supervisor/scalityServers/{}'.format(server)
+        for ip_address, disks in servers.items():
+            compname = 'scalitySupervisors/Supervisor/scalityServers/{}'.format(ip_address)
             disk_maps = []
             for disk in disks:
                 disk_id = disk['id']
                 om_disk = ObjectMap()
                 om_disk.id = self.prepId(disk_id)
-                om_disk.title = '{} ({})'.format(disk['name'], server)
+                server_id = disk['server']
+                for server in servers_data:
+                    if server['_links']['self'].endswith('/{}/'.format(server_id)):
+                        log.debug('ABC: server name: {}'.format(server['name']))
+                        server_name = server['name']
+                        break
+                om_disk.title = '{} ({})'.format(disk['name'], server_name)
                 om_disk.disk_id = disk_id
                 om_disk.host = disk['host']
-                om_disk.server_id = disk['server']
+                om_disk.server_id = server_id
+                om_disk.server_name = server_name
+                om_disk.server_ip = ip_address
                 om_disk.fs_id = disk['fsid']
                 om_disk.rings = ', '.join(disk['rings'])
                 disk_maps.append(om_disk)
