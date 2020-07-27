@@ -212,8 +212,6 @@ class scalityring(PythonPlugin):
     def model_disks(self, results, servers_data, log):
         log.debug('model_disks data: {}'.format(results))
 
-        log.debug('ABC: servers_data: {}'.format(len(servers_data)))
-
         servers = {}
         for entry in results:
             host_ip = entry['host']
@@ -232,7 +230,6 @@ class scalityring(PythonPlugin):
                 server_id = disk['server']
                 for server in servers_data:
                     if server['_links']['self'].endswith('/{}/'.format(server_id)):
-                        log.debug('ABC: server name: {}'.format(server['name']))
                         server_name = server['name']
                         break
                 om_disk.title = '{} ({})'.format(disk['name'], server_name)

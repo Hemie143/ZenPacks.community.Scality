@@ -11,6 +11,7 @@ class ScalityDisk(schema.ScalityDisk):
 
     state_values_maps = {
         0: 'OK',
+        1: 'OFFLINE',
     }
 
     def get_status(self):

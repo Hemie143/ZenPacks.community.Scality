@@ -42,10 +42,12 @@ class Disk(PythonDataSourcePlugin):
 
     state_value_maps = {
         'OK': 0,
+        'OFFLINE': 1,
     }
 
     state_severity_maps = {
         'OK': 0,
+        'OFFLINE': 4,
     }
 
     @classmethod
@@ -115,8 +117,10 @@ class Disk(PythonDataSourcePlugin):
             'eventClass': '/Status/Scality/Disk',
         })
 
-        state_value = max([self.state_value_maps.get(s, -1) for s in disk_metrics['state']])
-        state_severity = max([self.state_severity_maps.get(s, 3) for s in disk_metrics['state']])
+        disk_state = disk_metrics['state']
+        state_value = max([self.state_value_maps.get(s, -1) for s in disk_state])
+        state_severity = max([self.state_severity_maps.get(s, 3) for s in disk_state])
+        msg = 'Disk {} - State is {}'.format(comp_title, ', '.join(disk_state))
         data['values'][comp_id]['disk_state'] = state_value
         data['events'].append({
             'device': config.id,
@@ -124,8 +128,8 @@ class Disk(PythonDataSourcePlugin):
             'severity': state_severity,
             'eventKey': 'DiskStatus',
             'eventClassKey': 'DiskStatus',
-            'summary': 'Disk {} - State is {}'.format(comp_title, disk_metrics['state']),
-            'message': 'Disk {} - State is {}'.format(comp_title, disk_metrics['state']),
+            'summary': msg,
+            'message': msg,
             'eventClass': '/Status/Scality/Disk',
         })
 
