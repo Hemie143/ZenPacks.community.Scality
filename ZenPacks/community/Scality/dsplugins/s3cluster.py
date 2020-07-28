@@ -34,8 +34,14 @@ class S3Cluster(PythonDataSourcePlugin):
         'zScalityUseSSL',
     )
 
-    health_maps = {
+    health_value_maps = {
         'NOMINAL': 0,
+        'UNAVAILABLE': 1,
+    }
+
+    health_severity_maps = {
+        'NOMINAL': 0,
+        'UNAVAILABLE': 3,
     }
 
     @classmethod
@@ -92,16 +98,19 @@ class S3Cluster(PythonDataSourcePlugin):
         comp_title = datasource.params['component_title']
         cluster_metrics = result['_items'][0]
 
-        health_value = self.health_maps.get(cluster_metrics['cluster_health'], 3)
+        cluster_health = cluster_metrics['cluster_health']
+        health_value = self.health_value_maps.get(cluster_health, 2)
+        health_severity = self.health_severity_maps.get(cluster_health, 3)
+        msg = 'S3 Cluster {} - Health is {}'.format(comp_title, cluster_health)
         data['values'][comp_id]['s3cluster_health'] = health_value
         data['events'].append({
             'device': config.id,
             'component': comp_id,
-            'severity': health_value,
+            'severity': health_severity,
             'eventKey': 'S3ClusterStatus',
             'eventClassKey': 'S3ClusterStatus',
-            'summary': 'S3 Cluster {} - Health is {}'.format(comp_title, cluster_metrics['cluster_health']),
-            'message': 'S3 Cluster {} - Health is {}'.format(comp_title, cluster_metrics['cluster_health']),
+            'summary': msg,
+            'message': msg,
             'eventClass': '/Status/Scality/S3Cluster',
         })
 

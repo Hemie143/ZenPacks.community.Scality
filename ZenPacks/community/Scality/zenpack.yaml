@@ -620,10 +620,48 @@ event_classes:
     remove: false
   /Status/Scality/Ring:
     remove: false
+    transform: |-
+      import re
+
+      if evt.eventKey == 'RingState':
+        r = re.match('Ring .* - State is (.*)', evt.message)
+        if r:
+          state = r.group(1)
+          states = state.split(', ')
+          if u'RUN' in states and len(states) > 1:
+            # Delay
+            # Initialize existing_count.
+            existing_count = 0
+
+            # Prefix for fingerprint (dedupid).
+            dedupfields = [evt.device, evt.component, evt.eventClass]
+
+            if getattr(evt, 'eventKey', False):
+              dedupfields += [evt.eventKey, evt.severity]
+            else:
+              dedupfields += [evt.severity, evt.summary]
+
+            zep = getFacade('zep')
+            evt_filter = zep.createEventFilter(
+            status=(0,1,2),
+            fingerprint='|'.join(map(str, dedupfields)))
+
+            summaries = zep.getEventSummaries(0, 1, filter=evt_filter)
+            if summaries['total']:
+              existing_count = list(summaries['events'])[0]['count']
+            if existing_count > 2:
+              evt.severity = 4
+            else:
+              evt.severity = 2
+
   /Status/Scality/S3Cluster:
     remove: false
   /Status/Scality/Server:
     remove: false
+    transform: |-
+      if evt.eventKey == 'ServerDiskStatus':
+        evt._action = "drop"
+
   /Status/Scality/Volume:
     remove: false
 
