@@ -119,11 +119,6 @@ class Disk(PythonDataSourcePlugin):
         disk_metrics = result['_items'][0]
 
         status_value = self.status_maps.get(disk_metrics['status'], 3)
-
-        if comp_id == '10.252.100.221_g2disk5':
-            log.debug('ABC: status: {} = {}'.format(comp_id, disk_metrics['status']))
-            log.debug('ABC: status: {} = {}'.format(comp_id, status_value))
-
         data['values'][comp_id]['disk_status'] = status_value
         data['events'].append({
             'device': config.id,
@@ -139,13 +134,6 @@ class Disk(PythonDataSourcePlugin):
         disk_state = disk_metrics['state']
         state_value = max([self.state_value_maps.get(s, -1) for s in disk_state])
         state_severity = max([self.state_severity_maps.get(s, 3) for s in disk_state])
-
-        if comp_id == '10.252.100.221_g2disk5':
-            log.debug('ABC: state: {} = {}'.format(comp_id, disk_state))
-            log.debug('ABC: state: {} = {}'.format(comp_id, state_value))
-            log.debug('ABC: state: {} = {}'.format(comp_id, state_severity))
-
-
         msg = 'Disk {} - State is {}'.format(comp_title, ', '.join(disk_state))
         data['values'][comp_id]['disk_state'] = state_value
         data['events'].append({
@@ -166,9 +154,6 @@ class Disk(PythonDataSourcePlugin):
         if disk_metrics['diskspace_total'] != 0:
             perc_used = round(100.0 * disk_metrics['diskspace_used'] / disk_metrics['diskspace_total'], 2)
             data['values'][comp_id]['disk_diskspace_used_perc'] = perc_used
-
-        if comp_id == '10.252.100.221_g2disk5':
-            log.debug('ABC: disk data: {}'.format(data))
 
         return data
 

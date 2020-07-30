@@ -44,6 +44,7 @@ class Connector(PythonDataSourcePlugin):
         'OK': 0,
         'NEED_RELOAD': 1,
         'CONFIG MISMATCH': 2,
+        'CONFIG_MISMATCH': 2,
         'DOWN/OFFLINE': 3,
         'DOWN': 4,
         'OFFLINE': 5,
@@ -52,7 +53,7 @@ class Connector(PythonDataSourcePlugin):
     state_severity_maps = {
         'OK': 0,
         'NEED_RELOAD': 3,
-        'CONFIG MISMATCH': 3,
+        'CONFIG_MISMATCH': 3,
         'DOWN/OFFLINE': 5,
         'DOWN': 5,
         'OFFLINE': 5,

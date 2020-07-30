@@ -44,6 +44,7 @@ class Ring(PythonDataSourcePlugin):
         'RUN': 0,                       # OK
         'BALANCING': 1,                 # WARNING
         'CONFIG MISMATCH': 2,
+        'CONFIG_MISMATCH': 2,
         'OFFLINE': 3,
         'DISK USAGE WARNING': 4,
         'LOW STORAGE': 5,

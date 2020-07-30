@@ -34,8 +34,52 @@ class Node(PythonDataSourcePlugin):
         'zScalityUseSSL',
     )
 
-    state_maps = {
+    state_value_maps = {
         'RUN': 0,
+        'AVAILABLE': 1,
+        'NEW': 2,
+        'TASKS_BLOCKED': 3,
+        'LOOP': 4,
+        'LOADING': 5,
+        'LEAVING': 6,
+        'DSO CHANGING': 7,
+        'SPLIT': 8,
+        'CONF_MISMATCH': 9,
+        'ARC_REBUILD_NOK': 10,
+        'BAL(SRC)': 11,
+        'BAL(DST)': 12,
+        'OUT_OF_SERVICE': 13,
+        'NEED_RELOAD': 14,
+        'DISKERR': 15,
+        'DISKOFFLINE': 16,
+        'DISKWARN': 17,
+        'OFFLINE': 18,
+        'DUPKEY': 19,
+        'DISKFULL': 20,
+    }
+
+    state_severity_maps = {
+        'RUN': 0,
+        'AVAILABLE': 0,
+        'NEW': 0,
+        'TASKS_BLOCKED': 2,
+        'LOOP': 2,
+        'LOADING': 2,
+        'LEAVING': 2,
+        'DSO CHANGING': 2,
+        'SPLIT': 2,
+        'CONF_MISMATCH': 4,
+        'ARC_REBUILD_NOK': 4,
+        'BAL(SRC)': 4,
+        'BAL(DST)': 4,
+        'OUT_OF_SERVICE': 4,
+        'NEED_RELOAD': 4,
+        'DISKERR': 4,
+        'DISKOFFLINE': 4,
+        'DISKWARN': 4,
+        'OFFLINE': 5,
+        'DUPKEY': 5,
+        'DISKFULL': 5,
     }
 
     @classmethod
@@ -92,12 +136,13 @@ class Node(PythonDataSourcePlugin):
         comp_title = datasource.params['component_title']
         node_metrics = result['_items'][0]
 
-        state_value = self.state_maps.get(node_metrics['state'], 3)
+        state_value = self.state_value_maps.get(node_metrics['state'], -1)
+        state_severity = self.state_severity_maps_maps.get(node_metrics['state'], 3)
         data['values'][comp_id]['node_state'] = state_value
         data['events'].append({
             'device': config.id,
             'component': comp_id,
-            'severity': state_value,
+            'severity': state_severity,
             'eventKey': 'NodeState',
             'eventClassKey': 'NodeState',
             'summary': 'Node {} - State is {}'.format(comp_title, node_metrics['state']),

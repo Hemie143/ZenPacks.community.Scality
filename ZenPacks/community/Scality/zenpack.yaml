@@ -225,7 +225,7 @@ classes:
         api_only: true
         api_backendtype: method
         grid_display: true
-        label_width: 60
+        label_width: 100
       cluster_id:
         label: Cluster ID
         grid_display: false
