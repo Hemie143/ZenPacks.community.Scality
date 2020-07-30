@@ -98,8 +98,8 @@ class Node(PythonDataSourcePlugin):
             'device': config.id,
             'component': comp_id,
             'severity': state_value,
-            'eventKey': 'NodeStatus',
-            'eventClassKey': 'NodeStatus',
+            'eventKey': 'NodeState',
+            'eventClassKey': 'NodeState',
             'summary': 'Node {} - State is {}'.format(comp_title, node_metrics['state']),
             'message': 'Node {} - State is {}'.format(comp_title, node_metrics['state']),
             'eventClass': '/Status/Scality/Node',
@@ -108,13 +108,13 @@ class Node(PythonDataSourcePlugin):
         reachable = node_metrics['reachable']
         reachable_value = 0 if reachable else 5
         data['values'][comp_id]['node_reachable'] = reachable_value
-        msg = 'Node {} is{}reachable'.format(comp_id, " " if reachable else " NOT ")
+        msg = 'Node {} is{}reachable'.format(comp_title, " " if reachable else " NOT ")
         data['events'].append({
             'device': config.id,
             'component': comp_id,
             'severity': reachable_value,
-            'eventKey': 'NodeStatus',
-            'eventClassKey': 'NodeStatus',
+            'eventKey': 'NodeReachable',
+            'eventClassKey': 'NodeReachable',
             'summary': msg,
             'message': msg,
             'eventClass': '/Status/Scality/Node',
@@ -123,13 +123,13 @@ class Node(PythonDataSourcePlugin):
         conf_ok = not node_metrics['conf_mismatch']
         conf_ok_value = 0 if conf_ok else 5
         data['values'][comp_id]['node_conf_mismatch'] = conf_ok_value
-        msg = 'Node {} - Configuration is {}'.format(comp_id, "OK" if conf_ok else "WRONG")
+        msg = 'Node {} - Configuration is {}'.format(comp_title, "OK" if conf_ok else "WRONG")
         data['events'].append({
             'device': config.id,
             'component': comp_id,
             'severity': conf_ok_value,
-            'eventKey': 'NodeStatus',
-            'eventClassKey': 'NodeStatus',
+            'eventKey': 'NodeConfig',
+            'eventClassKey': 'NodeConfig',
             'summary': msg,
             'message': msg,
             'eventClass': '/Status/Scality/Node',
@@ -138,13 +138,13 @@ class Node(PythonDataSourcePlugin):
         tasks_ok = not node_metrics['tasks_blocked']
         tasks_ok_value = 0 if tasks_ok else 5
         data['values'][comp_id]['node_tasks_blocked'] = tasks_ok_value
-        msg = 'Node {} - {}'.format(comp_id, "No stuck task" if tasks_ok else "Some tasks are stuck")
+        msg = 'Node {} - {}'.format(comp_title, "No stuck task" if tasks_ok else "Some tasks are stuck")
         data['events'].append({
             'device': config.id,
             'component': comp_id,
             'severity': tasks_ok_value,
-            'eventKey': 'NodeStatus',
-            'eventClassKey': 'NodeStatus',
+            'eventKey': 'NodeTasksBlocked',
+            'eventClassKey': 'NodeTasksBlocked',
             'summary': msg,
             'message': msg,
             'eventClass': '/Status/Scality/Node',

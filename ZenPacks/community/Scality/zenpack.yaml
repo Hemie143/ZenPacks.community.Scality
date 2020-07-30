@@ -618,6 +618,34 @@ event_classes:
     remove: false
   /Status/Scality/Node:
     remove: false
+    transform: |-
+      import re
+
+      if evt.eventKey in ['NodeTasksBlocked', 'NodeConfig', 'NodeState']:
+          # Initialize existing_count.
+          existing_count = 0
+
+          # Prefix for fingerprint (dedupid).
+          dedupfields = [evt.device, evt.component, evt.eventClass]
+
+          if getattr(evt, 'eventKey', False):
+            dedupfields += [evt.eventKey, evt.severity]
+          else:
+            dedupfields += [evt.severity, evt.summary]
+
+          zep = getFacade('zep')
+          evt_filter = zep.createEventFilter(
+          status=(0,1,2),
+          fingerprint='|'.join(map(str, dedupfields)))
+
+          summaries = zep.getEventSummaries(0, 1, filter=evt_filter)
+          if summaries['total']:
+            existing_count = list(summaries['events'])[0]['count']
+          if existing_count > 2:
+            evt.severity = 4
+          else:
+            evt.severity = 2
+
   /Status/Scality/Ring:
     remove: false
     transform: |-
@@ -656,6 +684,34 @@ event_classes:
 
   /Status/Scality/S3Cluster:
     remove: false
+    transform: |-
+      import re
+
+      if evt.eventKey == 'S3ClusterHealth':
+          # Initialize existing_count.
+          existing_count = 0
+
+          # Prefix for fingerprint (dedupid).
+          dedupfields = [evt.device, evt.component, evt.eventClass]
+
+          if getattr(evt, 'eventKey', False):
+            dedupfields += [evt.eventKey, evt.severity]
+          else:
+            dedupfields += [evt.severity, evt.summary]
+
+          zep = getFacade('zep')
+          evt_filter = zep.createEventFilter(
+          status=(0,1,2),
+          fingerprint='|'.join(map(str, dedupfields)))
+
+          summaries = zep.getEventSummaries(0, 1, filter=evt_filter)
+          if summaries['total']:
+            existing_count = list(summaries['events'])[0]['count']
+          if existing_count > 2:
+            evt.severity = 4
+          else:
+            evt.severity = 2
+
   /Status/Scality/Server:
     remove: false
     transform: |-

@@ -11,7 +11,14 @@ class ScalityDisk(schema.ScalityDisk):
 
     state_values_maps = {
         0: 'OK',
-        1: 'OFFLINE',
+        1: 'CONNERR',
+        2: 'OOS_SYS',
+        3: 'CONNTIMEOUT',
+        4: 'STOREERR',
+        5: 'OFFLINE',
+        6: 'OOS_PERM',
+        7: 'OOS_TEMP',
+        8: 'DISKFULL',
     }
 
     def get_status(self):
@@ -20,7 +27,7 @@ class ScalityDisk(schema.ScalityDisk):
         try:
             value = int(value)
         except ValueError:
-            return 'Unknown'
+            return 'Unknown: {}'.format(value)
         if value in self.status_values_maps:
             return self.status_values_maps.get(value)
         return 'Undefined'
