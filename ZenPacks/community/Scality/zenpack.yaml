@@ -616,34 +616,57 @@ event_classes:
     remove: false
   /Status/Scality/Disk:
     remove: false
+    transform: |-
+      import re
+
+      if evt.eventKey in ['DiskState', 'DiskStatus']:
+        # Initialize existing_count.
+        existing_count = 0
+
+        zep = getFacade('zep')
+        # Create filter without taking the severity into account
+
+        evt_filter = zep.createEventFilter(
+          status=(0,1,2),							# New, ack'd or suppressed
+          element_identifier=evt.device,
+          element_sub_identifier=evt.component,
+          event_key=evt.eventKey
+          )
+
+        summaries = zep.getEventSummaries(offset=0, limit=1, filter=evt_filter)
+        if summaries['total']:
+          existing_count = list(summaries['events'])[0]['count']
+
+        if existing_count < 3:
+          evt.severity = 2
+
   /Status/Scality/Node:
     remove: false
     transform: |-
       import re
 
-      if evt.eventKey in ['NodeTasksBlocked', 'NodeConfig', 'NodeState']:
+      if evt.eventKey in ['NodeTasksBlocked'] and evt.severity > 2:
+          evt.severity = 2
+
+      if evt.eventKey in ['NodeConfig', 'NodeState']:
           # Initialize existing_count.
           existing_count = 0
 
-          # Prefix for fingerprint (dedupid).
-          dedupfields = [evt.device, evt.component, evt.eventClass]
-
-          if getattr(evt, 'eventKey', False):
-            dedupfields += [evt.eventKey, evt.severity]
-          else:
-            dedupfields += [evt.severity, evt.summary]
-
           zep = getFacade('zep')
-          evt_filter = zep.createEventFilter(
-          status=(0,1,2),
-          fingerprint='|'.join(map(str, dedupfields)))
+          # Create filter without taking the severity into account
 
-          summaries = zep.getEventSummaries(0, 1, filter=evt_filter)
+          evt_filter = zep.createEventFilter(
+            status=(0,1,2),							# New, ack'd or suppressed
+            element_identifier=evt.device,
+            element_sub_identifier=evt.component,
+            event_key=evt.eventKey
+            )
+
+          summaries = zep.getEventSummaries(offset=0, limit=1, filter=evt_filter)
           if summaries['total']:
             existing_count = list(summaries['events'])[0]['count']
-          if existing_count > 2:
-            evt.severity = 4
-          else:
+
+          if existing_count < 3:
             evt.severity = 2
 
   /Status/Scality/Ring:
@@ -657,29 +680,24 @@ event_classes:
           state = r.group(1)
           states = state.split(', ')
           if u'RUN' in states and len(states) > 1:
-            # Delay
             # Initialize existing_count.
             existing_count = 0
 
-            # Prefix for fingerprint (dedupid).
-            dedupfields = [evt.device, evt.component, evt.eventClass]
-
-            if getattr(evt, 'eventKey', False):
-              dedupfields += [evt.eventKey, evt.severity]
-            else:
-              dedupfields += [evt.severity, evt.summary]
-
             zep = getFacade('zep')
-            evt_filter = zep.createEventFilter(
-            status=(0,1,2),
-            fingerprint='|'.join(map(str, dedupfields)))
+            # Create filter without taking the severity into account
 
-            summaries = zep.getEventSummaries(0, 1, filter=evt_filter)
+            evt_filter = zep.createEventFilter(
+              status=(0,1,2),							# New, ack'd or suppressed
+              element_identifier=evt.device,
+              element_sub_identifier=evt.component,
+              event_key=evt.eventKey
+              )
+
+            summaries = zep.getEventSummaries(offset=0, limit=1, filter=evt_filter)
             if summaries['total']:
               existing_count = list(summaries['events'])[0]['count']
-            if existing_count > 2:
-              evt.severity = 4
-            else:
+
+            if existing_count < 3:
               evt.severity = 2
 
   /Status/Scality/S3Cluster:
@@ -691,32 +709,28 @@ event_classes:
           # Initialize existing_count.
           existing_count = 0
 
-          # Prefix for fingerprint (dedupid).
-          dedupfields = [evt.device, evt.component, evt.eventClass]
-
-          if getattr(evt, 'eventKey', False):
-            dedupfields += [evt.eventKey, evt.severity]
-          else:
-            dedupfields += [evt.severity, evt.summary]
-
           zep = getFacade('zep')
-          evt_filter = zep.createEventFilter(
-          status=(0,1,2),
-          fingerprint='|'.join(map(str, dedupfields)))
+          # Create filter without taking the severity into account
 
-          summaries = zep.getEventSummaries(0, 1, filter=evt_filter)
+          evt_filter = zep.createEventFilter(
+            status=(0,1,2),							# New, ack'd or suppressed
+            element_identifier=evt.device,
+            element_sub_identifier=evt.component,
+            event_key=evt.eventKey
+            )
+
+          summaries = zep.getEventSummaries(offset=0, limit=1, filter=evt_filter)
           if summaries['total']:
             existing_count = list(summaries['events'])[0]['count']
-          if existing_count > 2:
-            evt.severity = 4
-          else:
+
+          if existing_count < 3:
             evt.severity = 2
 
   /Status/Scality/Server:
     remove: false
     transform: |-
-      if evt.eventKey == 'ServerDiskStatus':
-        evt._action = "drop"
+      if evt.severity > 2:
+        evt.severity = 2
 
   /Status/Scality/Volume:
     remove: false

@@ -14,7 +14,7 @@ from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonD
 from zope.interface import implementer
 
 # Setup logging
-log = logging.getLogger('zen.ScalityRing')
+log = logging.getLogger('zen.ScalitySupervisor')
 
 
 # TODO: Move this factory in a library

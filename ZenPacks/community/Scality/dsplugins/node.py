@@ -14,7 +14,7 @@ from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonD
 from zope.interface import implementer
 
 # Setup logging
-log = logging.getLogger('zen.ScalityRing')
+log = logging.getLogger('zen.ScalityNode')
 
 
 # TODO: Move this factory in a library
@@ -137,7 +137,7 @@ class Node(PythonDataSourcePlugin):
         node_metrics = result['_items'][0]
 
         state_value = self.state_value_maps.get(node_metrics['state'], -1)
-        state_severity = self.state_severity_maps_maps.get(node_metrics['state'], 3)
+        state_severity = self.state_severity_maps.get(node_metrics['state'], 3)
         data['values'][comp_id]['node_state'] = state_value
         data['events'].append({
             'device': config.id,

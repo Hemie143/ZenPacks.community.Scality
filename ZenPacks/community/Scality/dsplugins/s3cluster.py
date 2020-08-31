@@ -14,7 +14,7 @@ from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonD
 from zope.interface import implementer
 
 # Setup logging
-log = logging.getLogger('zen.ScalityRing')
+log = logging.getLogger('zen.ScalityS3Cluster')
 
 
 # TODO: Move this factory in a library
@@ -101,6 +101,7 @@ class S3Cluster(PythonDataSourcePlugin):
         cluster_health = cluster_metrics['cluster_health']
         health_value = self.health_value_maps.get(cluster_health, 2)
         health_severity = self.health_severity_maps.get(cluster_health, 3)
+
         msg = 'S3 Cluster {} - Health is {}'.format(comp_title, cluster_health)
         data['values'][comp_id]['s3cluster_health'] = health_value
         data['events'].append({

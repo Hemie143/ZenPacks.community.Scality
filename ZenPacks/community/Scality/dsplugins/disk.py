@@ -14,7 +14,7 @@ from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonD
 from zope.interface import implementer
 
 # Setup logging
-log = logging.getLogger('zen.ScalityRing')
+log = logging.getLogger('zen.ScalityDisk')
 
 
 # TODO: Move this factory in a library
@@ -140,8 +140,8 @@ class Disk(PythonDataSourcePlugin):
             'device': config.id,
             'component': comp_id,
             'severity': state_severity,
-            'eventKey': 'DiskStatus',
-            'eventClassKey': 'DiskStatus',
+            'eventKey': 'DiskState',
+            'eventClassKey': 'DiskState',
             'summary': msg,
             'message': msg,
             'eventClass': '/Status/Scality/Disk',
