@@ -704,27 +704,48 @@ event_classes:
     remove: false
     transform: |-
       import re
+      import time
 
       if evt.eventKey == 'S3ClusterHealth':
+          max_count = 4
+          poll_interval = 300		# seconds
+
+          current_time = time.time() * 1000
+          timeframe = poll_interval * 2.1 * 1000
+          last_seen_back = current_time - timeframe
+
+
           # Initialize existing_count.
           existing_count = 0
-
           zep = getFacade('zep')
-          # Create filter without taking the severity into account
 
+          # Create filter without taking the severity into account
           evt_filter = zep.createEventFilter(
-            status=(0,1,2),							# New, ack'd or suppressed
+            status=(0,1),												# New or ack'd
             element_identifier=evt.device,
             element_sub_identifier=evt.component,
-            event_key=evt.eventKey
+            event_key=evt.eventKey,
+            last_seen=[last_seen_back, current_time],					# Check recent events, start_time and end_time
             )
 
-          summaries = zep.getEventSummaries(offset=0, limit=1, filter=evt_filter)
+          summaries = zep.getEventSummaries(offset=0, limit=1, filter=evt_filter)			# {'next_offset': None, 'total': 0, 'limit': 1, 'events': <generator object <genexpr> at 0x7f74404a4410>}
           if summaries['total']:
-            existing_count = list(summaries['events'])[0]['count']
+            event0 = list(summaries['events'])
+            if event0:
+              existing_count = event0[0]['count']
 
-          if existing_count < 3:
+          if existing_count < max_count:
             evt.severity = 2
+
+          # Close old events
+          evt_filter = zep.createEventFilter(
+            status=(0,1),												# New or ack'd
+            element_identifier=evt.device,
+            element_sub_identifier=evt.component,
+            event_key=evt.eventKey,
+            last_seen=[0, last_seen_back],							# Check old events
+            )
+          zep.closeEventSummaries(eventFilter=evt_filter, userName='admin')
 
   /Status/Scality/Server:
     remove: false

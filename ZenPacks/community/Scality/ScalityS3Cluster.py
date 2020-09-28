@@ -5,7 +5,9 @@ class ScalityS3Cluster(schema.ScalityS3Cluster):
 
     health_values_maps = {
         0: 'NOMINAL',
-        1: 'UNAVAILABLE'
+        1: 'UNAVAILABLE',
+        2: 'DEGRADED',
+        3: 'ERROR',
     }
 
     def get_cluster_health(self):

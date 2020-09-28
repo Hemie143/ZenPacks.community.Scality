@@ -121,7 +121,7 @@ class Ring(PythonDataSourcePlugin):
         # Forecast
         usage_growth = ring_metrics['planning_usage_growth']
         planning_age = ring_metrics['planning_used_capacity_age']
-        if planning_age == 0:
+        if planning_age == 0 or not usage_growth:
             growth_month = 0
         else:
             growth_month = 30.0 * usage_growth / planning_age

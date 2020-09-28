@@ -103,11 +103,11 @@ class Disk(PythonDataSourcePlugin):
             response = yield agent.request('GET', url, Headers(headers))
             response_body = yield readBody(response)
             response_body = json.loads(response_body)
+            returnValue(response_body)
         except Exception as e:
             log.exception('{}: failed to get server data for {}'.format(config.id, ds0))
             log.exception('{}: Exception: {}'.format(config.id, e))
-
-        returnValue(response_body)
+        returnValue()
 
     def onSuccess(self, result, config):
         log.debug('Success job - result is {}'.format(result))

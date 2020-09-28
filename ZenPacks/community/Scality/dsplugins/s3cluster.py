@@ -37,11 +37,15 @@ class S3Cluster(PythonDataSourcePlugin):
     health_value_maps = {
         'NOMINAL': 0,
         'UNAVAILABLE': 1,
+        'DEGRADED': 2,
+        'ERROR': 3,
     }
 
     health_severity_maps = {
         'NOMINAL': 0,
         'UNAVAILABLE': 3,
+        'DEGRADED': 3,
+        'ERROR': 4,
     }
 
     @classmethod
