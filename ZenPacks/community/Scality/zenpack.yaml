@@ -10,6 +10,17 @@ zProperties:
   zScalityUseSSL:
     type: boolean
     default: true
+  zScalityS3BucketHost:
+    type: string
+  zScalityUTAPIHost:
+    type: string
+  zScalityUTAPIPort:
+    type: int
+    default: 8100
+  zScalityS3AccessKeys:
+    type: lines
+  zScalityS3SecretKeys:
+    type: lines
 
 classes:
   ScalitySupervisor:
@@ -212,6 +223,25 @@ classes:
         label: Planning period (days)
         grid_display: false
 
+  ScalityS3BucketAccount:
+    base: [zenpacklib.Component]
+    label: Scality S3 Bucket Account
+
+  ScalityS3Bucket:
+    base: [zenpacklib.Component]
+    label: Scality S3 Bucket
+    monitoring_templates: [ScalityS3Bucket]
+    properties:
+      creation_date:
+        label: Creation date
+        grid_display: false
+      bucket_name:
+        label: Bucket Name
+        grid_display: false
+      key_index:
+        grid_display: false
+        details_display: false
+
   ScalityS3Cluster:
     base: [zenpacklib.Component]
     label: Scality S3 Cluster
@@ -320,6 +350,8 @@ class_relationships:
   - ScalityServer 1:MC ScalityDisk
   - ScalityRing 1:MC ScalityNode
   - ScalityRing 1:MC ScalityConnector
+  - Products.ZenModel.Device.Device 1:MC ScalityS3BucketAccount
+  - ScalityS3BucketAccount 1:MC ScalityS3Bucket
 
 device_classes:
   /Server/SSH/Linux/Scality:
@@ -517,6 +549,45 @@ device_classes:
             graphpoints:
               Pending Tasks:
                 dpName: node_nb_tasks
+                sequence: 1
+
+      ScalityS3Bucket:
+        targetPythonClass: ZenPacks.community.Scality.ScalityS3Bucket
+        datasources:
+          s3bucket:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.s3bucket.S3Bucket
+            datapoints:
+              num_objects:
+                rrdtype: GAUGE_MIN_0
+              bucket_size:
+                rrdtype: GAUGE_MIN_0
+              response_time:
+                rrdtype: GAUGE_MIN_0
+        graphs:
+          Bucket Size:
+            units: bytes
+            miny: 0
+            base: true
+            graphpoints:
+              Bucket Size:
+                lineType: AREA
+                dpName: s3bucket_bucket_size
+                sequence: 1
+          Number of Objects:
+            units: objects
+            miny: 0
+            graphpoints:
+              Number of Objects:
+                lineType: AREA
+                dpName: s3bucket_num_objects
+                sequence: 1
+          Response Time:
+            units: seconds
+            miny: 0
+            graphpoints:
+              Response Time:
+                dpName: s3bucket_response_time
                 sequence: 1
 
       ScalityS3Cluster:

@@ -1,6 +1,12 @@
+"""
+Collect Scality components using API calls
+"""
+
 # stdlib Imports
 import json
 import base64
+from datetime import datetime
+from bs4 import BeautifulSoup
 
 # Twisted Imports
 from twisted.internet.defer import inlineCallbacks, returnValue
@@ -14,6 +20,7 @@ from Products.DataCollector.plugins.CollectorPlugin import PythonPlugin
 from Products.DataCollector.plugins.DataMaps import ObjectMap, RelationshipMap
 from zope.interface import implementer
 
+from ZenPacks.community.Scality.lib.aws4_sign import sign_request
 
 @implementer(IPolicyForHTTPS)
 class SkipCertifContextFactory(object):
@@ -29,6 +36,9 @@ class scalityring(PythonPlugin):
         'zScalityUsername',
         'zScalityPassword',
         'zScalityUseSSL',
+        'zScalityS3BucketHost',
+        'zScalityS3AccessKeys',
+        'zScalityS3SecretKeys',
     )
 
     deviceProperties = PythonPlugin.deviceProperties + requiredProperties
@@ -76,6 +86,8 @@ class scalityring(PythonPlugin):
             'connectors': '{}://{}/api/v0.1/volume_connectors/?offset={}&limit={}',
         }
 
+        # queries = {}
+
         for item, base_url in queries.items():
             try:
                 data = []
@@ -93,14 +105,34 @@ class scalityring(PythonPlugin):
                 results[item] = data
             except Exception, e:
                 log.error('%s: %s', device.id, e)
-                returnValue(None)
 
+        zScalityS3BucketHost = getattr(device, 'zScalityS3BucketHost', None)
+        zScalityS3AccessKeys = getattr(device, 'zScalityS3AccessKeys', None)
+        log.debug('zScalityS3AccessKeys: {}'.format(zScalityS3AccessKeys))
+        log.debug('zScalityS3AccessKeys: {}'.format(type(zScalityS3AccessKeys)))
+        zScalityS3SecretKeys = getattr(device, 'zScalityS3SecretKeys', None)
+        log.debug('zScalityS3SecretKeys: {}'.format(zScalityS3SecretKeys))
+        num_keypairs = min(len(zScalityS3AccessKeys), len(zScalityS3SecretKeys))
+        if zScalityS3BucketHost and zScalityS3AccessKeys and zScalityS3SecretKeys:
+            results['s3buckets'] = []
+            for i in range(num_keypairs):
+                url = 'https://{}'.format(zScalityS3BucketHost)
+                headers = sign_request(url, zScalityS3AccessKeys[i], zScalityS3SecretKeys[i])
+                log.debug('headers: {}'.format(headers))
+                try:
+                    response = yield agent.request('GET', url, Headers(headers))
+                    response_body = yield readBody(response)
+                    log.debug('response: {}'.format(response))
+                    log.debug('response_body: {}'.format(response_body))
+                    results['s3buckets'].append(response_body)
+                except Exception, e:
+                    log.error('%s: %s', device.id, e)
         returnValue(results)
 
     def process(self, device, results, log):
-        log.debug('results: {}'.format(results))
-
+        # log.debug('results: {}'.format(results))
         rm = []
+
         if 'supervisor' in results:
             rm.append(self.model_supervisor(results['supervisor'], log))
             if 's3clusters' in results:
@@ -117,6 +149,9 @@ class scalityring(PythonPlugin):
                 rm.extend(self.model_nodes(results['nodes'], log))
             if 'connectors' in results:
                 rm.extend(self.model_connectors(results['connectors'], log))
+        if 's3buckets' in results:
+            rm.extend(self.model_s3buckets(results['s3buckets'], log))
+
         return rm
 
     def model_supervisor(self, data, log):
@@ -147,6 +182,54 @@ class scalityring(PythonPlugin):
                                modname='ZenPacks.community.Scality.ScalityS3Cluster',
                                objmaps=s3cluster_maps)
 
+    def model_s3buckets(self, s3buckets, log):
+        log.debug('model_s3buckets data: {}'.format(s3buckets))
+
+        rm = []
+        rm_owner = []
+        rm_bucket = []
+        for entry in s3buckets:
+            soup = BeautifulSoup(entry, 'xml')
+            log.debug('AAA soup: {}'.format(soup))
+
+            om_owner = ObjectMap()
+            id = 'bucketaccount_{}'.format(soup.find("Owner").find("ID").text)
+            om_owner.id = self.prepId(id)
+            om_owner.title = soup.find("Owner").find("DisplayName").text
+            rm_owner.append(om_owner)
+            log.debug('AAA om_owner: {}'.format(om_owner))
+            comp_id = 'scalityS3BucketAccounts/{}'.format(om_owner.id)
+
+            s3bucket_maps = []
+            buckets_list = soup.find_all(name="Bucket")
+            log.debug('buckets: {}'.format(buckets_list))
+            for s3bucket in buckets_list:
+                bucket_name = s3bucket.Name.text
+                log.debug('bucket_name: {}'.format(bucket_name))
+                om_s3bucket = ObjectMap()
+                id = 'bucket_{}_{}'.format(om_owner.title, bucket_name)
+                om_s3bucket.id = self.prepId(id)
+                om_s3bucket.title = bucket_name
+                om_s3bucket.creation_date = s3bucket.CreationDate.text
+                s3bucket_maps.append(om_s3bucket)
+
+            rm_bucket.append(RelationshipMap(compname=comp_id,
+                                             relname='scalityS3Buckets',
+                                             modname='ZenPacks.community.Scality.ScalityS3Bucket',
+                                             objmaps=s3bucket_maps))
+        # log.debug('rm_owner: {}'.format(rm_owner))
+        # log.debug('rm_bucket: {}'.format(rm_bucket))
+        rm.append(RelationshipMap(relname='scalityS3BucketAccounts',
+                                  modname='ZenPacks.community.Scality.ScalityS3BucketAccount',
+                                  compname='',
+                                  objmaps=rm_owner))
+
+        # rm.extend(rm_owner)
+        rm.extend(rm_bucket)
+
+        log.debug('rm: {}'.format(rm))
+        return rm
+
     def model_servers(self, servers, log):
         log.debug('model_servers data: {}'.format(servers))
         server_maps = []
@@ -162,7 +245,18 @@ class scalityring(PythonPlugin):
             om_server.zone = server['zone']
             # TODO: check usage of id in datasource
             om_server.server_id = server['id']
-            om_server.rings = ', '.join(sorted([r['name'] for r in server['rings']]))
+            # TODO: BUG since 8.x : TypeError: string indices must be integers
+            log.debug('XXX server: {}'.format(server))
+            rings = server['rings']
+
+            if rings:
+                log.debug('*** rings: {}'.format(isinstance(rings[0], dict)))
+                return
+                # Supervisor 7.4.6.1
+                om_server.rings = ', '.join(sorted([r['name'] for r in server['rings']]))
+            else:
+                # Supervisor 8.3.0.5
+                om_server.rings = ', '.join(sorted(server['rings']))
             om_server.roles = ', '.join(sorted(server['roles']))
             om_server.disks = ', '.join(server['disks'])
             server_maps.append(om_server)
