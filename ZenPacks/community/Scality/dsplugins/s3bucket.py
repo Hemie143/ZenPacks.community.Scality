@@ -2,13 +2,15 @@ import json
 import logging
 import base64
 import time
+import datetime
+from collections import defaultdict
 from bs4 import BeautifulSoup
 from urllib import quote
 
 # Twisted Imports
-from twisted.internet import reactor, ssl
+from twisted.internet import reactor
 from twisted.internet.defer import returnValue, inlineCallbacks
-from twisted.web.client import Agent, readBody, BrowserLikePolicyForHTTPS
+from twisted.web.client import Agent, readBody
 from twisted.web.http_headers import Headers
 from twisted.web.iweb import IPolicyForHTTPS
 
@@ -17,105 +19,102 @@ from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonD
 from zope.interface import implementer
 
 from ZenPacks.community.Scality.lib.aws4_sign import sign_request
+from ZenPacks.community.Scality.lib.utils import get_time_range, BytesProducer, SkipCertifContextFactory
 
 # Setup logging
 log = logging.getLogger('zen.ScalityS3Bucket')
 
-
-# TODO: Move this factory in a library
-@implementer(IPolicyForHTTPS)
-class SkipCertifContextFactory(object):
-    def __init__(self):
-        self.default_policy = BrowserLikePolicyForHTTPS()
-
-    def creatorForNetloc(self, hostname, port):
-        return ssl.CertificateOptions(verify=False)
-
-
+0
 class S3Bucket(PythonDataSourcePlugin):
     proxy_attributes = (
-        'zScalityS3BucketHost',
-        'zScalityS3AccessKey',
-        'zScalityS3SecretKey',
+        'zScalityS3AccessKeys',
+        'zScalityS3SecretKeys',
+        'zScalityUTAPIHost',
+        'zScalityUTAPIPort',
     )
 
     @classmethod
     def config_key(cls, datasource, context):
-        log.info('In config_key {} {} {} {}'.format(context.device().id,
+        log.info('In config_key {} {} {}'.format(context.device().id,
                                                  datasource.getCycleTime(context),
-                                                 context.id,
                                                  'ScalityS3Bucket'))
 
         return (context.device().id,
                 datasource.getCycleTime(context),
-                context.id,
                 'ScalityS3Bucket'
         )
 
     @classmethod
     def params(cls, datasource, context):
         params = {}
-        params['bucket_name'] = context.title
+        params['bucket_name'] = context.bucket_name
+        params['key_index'] = context.key_index
         return params
-
 
     @inlineCallbacks
     def collect(self, config):
         log.debug('Starting Scality S3Bucket collect')
+        # Runs for all buckets
+        bucket_config = defaultdict(list)
+        for ds in config.datasources:
+            bucket_config[ds.params['key_index']].append(ds.params['bucket_name'])
 
         ds0 = config.datasources[0]
-        zScalityS3BucketHost = ds0.zScalityS3BucketHost
-        zScalityS3AccessKey = ds0.zScalityS3AccessKey
-        zScalityS3SecretKey = ds0.zScalityS3SecretKey
-        result = {'data': []}
-        if zScalityS3BucketHost and zScalityS3AccessKey and zScalityS3SecretKey:
-            ds0 = config.datasources[0]
-            component = ds0.component
-            bucket_name = ds0.params['bucket_name']
+        zScalityS3AccessKeys = ds0.zScalityS3AccessKeys
+        zScalityS3SecretKeys = ds0.zScalityS3SecretKeys
+        zScalityUTAPIHost = ds0.zScalityUTAPIHost
+        zScalityUTAPIPort = ds0.zScalityUTAPIPort
+
+        result = {}
+        if zScalityUTAPIHost and zScalityS3AccessKeys and zScalityS3SecretKeys:
             agent = Agent(reactor, contextFactory=SkipCertifContextFactory())
-            key = ''
-            num_objects = 0
-            start_time = time.time()
-            while True:
-                url = 'https://{}/{}/?marker={}'.format(zScalityS3BucketHost, bucket_name, key)
-                log.debug('AAA url: {}'.format(url))
-                headers = sign_request(url, zScalityS3AccessKey, zScalityS3SecretKey)
+            # Timeframe to fetch from UTAPI
+            start_time, end_time = get_time_range(time.time() * 1000)
+            for key_index, bucket_list in bucket_config.items():
+                # URL
+                url = 'http://{}:{}/buckets?Action=ListMetrics'.format(zScalityUTAPIHost, zScalityUTAPIPort)
+                # Payload
+                bucketListing = {
+                    'buckets': bucket_list,
+                    'timeRange': [start_time, end_time],
+                }
+                payload = json.dumps(bucketListing)
+                # headers
+                zScalityS3AccessKey = zScalityS3AccessKeys[key_index]
+                zScalityS3SecretKey = zScalityS3SecretKeys[key_index]
+                headers = sign_request(url,
+                                       zScalityS3AccessKey,
+                                       zScalityS3SecretKey,
+                                       method='POST',
+                                       payload=payload,
+                                       )
+                # body
+                body = BytesProducer(payload)
                 try:
-                    response = yield agent.request('GET', url, Headers(headers))
+                    response = yield agent.request('POST', url, Headers(headers), body)
                     response_body = yield readBody(response)
-
-                    soup = BeautifulSoup(response_body, 'xml')
-                    contents = soup('Contents')
-                    result['data'].extend([int(c.Size.text) for c in contents])
-                    page_len = len(contents)
-                    num_objects += page_len
-                    log.debug('AAA num_objects: {}'.format(num_objects))
-
-                    maxkeys = int(soup.find('MaxKeys').text)
-                    if page_len < maxkeys:
-                        break
-                    last_content = contents[-1]
-                    key = quote(last_content.Key.text, safe='-_.~')
+                    result[key_index] = response_body
                 except Exception as e:
                     log.exception('{}: failed to get server data for {}'.format(config.id, ds0))
                     log.exception('{}: Exception: {}'.format(config.id, e))
-            result['time'] = time.time() - start_time
-            result['num_objects'] = num_objects
         returnValue(result)
 
     def onSuccess(self, result, config):
         log.debug('Success job - result is {}'.format(result))
         data = self.new_data()
 
-        datasource = config.datasources[0]
-        comp_id = datasource.component
-        data['values'][comp_id]['s3bucket_num_objects'] = result['num_objects']
-        data['values'][comp_id]['s3bucket_response_time'] = result['time']
-        log.debug('onSuccess len: {}'.format(len(result['data'])))
-        data['values'][comp_id]['s3bucket_bucket_size'] = sum(result['data'])
-
-        log.debug('onSuccess data: {}'.format(data))
-
+        for ds in config.datasources:
+            bucket_name = ds.params['bucket_name']
+            key_index = ds.params['key_index']
+            for bucket_data in json.loads(result[key_index]):
+                if bucket_data['bucketName'] == bucket_name:
+                    break
+            else:
+                bucket_data = {}
+            data['values'][ds.component]['s3bucket_num_objects'] = bucket_data['numberOfObjects'][1]
+            data['values'][ds.component]['s3bucket_bucket_size'] = bucket_data['storageUtilized'][1]
+            data['values'][ds.component]['s3bucket_incoming_bytes'] = bucket_data['incomingBytes']
+            data['values'][ds.component]['s3bucket_outgoing_bytes'] = bucket_data['outgoingBytes']
         return data
 
     def onError(self, result, config):

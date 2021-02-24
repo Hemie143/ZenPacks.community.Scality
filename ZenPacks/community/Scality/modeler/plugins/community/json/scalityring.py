@@ -124,7 +124,11 @@ class scalityring(PythonPlugin):
                     response_body = yield readBody(response)
                     log.debug('response: {}'.format(response))
                     log.debug('response_body: {}'.format(response_body))
-                    results['s3buckets'].append(response_body)
+                    bucket_data = {
+                        'key_index': i,
+                        'body': response_body
+                    }
+                    results['s3buckets'].append(bucket_data)
                 except Exception, e:
                     log.error('%s: %s', device.id, e)
         returnValue(results)
@@ -133,6 +137,7 @@ class scalityring(PythonPlugin):
         # log.debug('results: {}'.format(results))
         rm = []
 
+        '''
         if 'supervisor' in results:
             rm.append(self.model_supervisor(results['supervisor'], log))
             if 's3clusters' in results:
@@ -149,6 +154,7 @@ class scalityring(PythonPlugin):
                 rm.extend(self.model_nodes(results['nodes'], log))
             if 'connectors' in results:
                 rm.extend(self.model_connectors(results['connectors'], log))
+        '''
         if 's3buckets' in results:
             rm.extend(self.model_s3buckets(results['s3buckets'], log))
 
@@ -189,7 +195,7 @@ class scalityring(PythonPlugin):
         rm_owner = []
         rm_bucket = []
         for entry in s3buckets:
-            soup = BeautifulSoup(entry, 'xml')
+            soup = BeautifulSoup(entry['body'], 'xml')
             log.debug('AAA soup: {}'.format(soup))
 
             om_owner = ObjectMap()
@@ -210,7 +216,9 @@ class scalityring(PythonPlugin):
                 id = 'bucket_{}_{}'.format(om_owner.title, bucket_name)
                 om_s3bucket.id = self.prepId(id)
                 om_s3bucket.title = bucket_name
+                om_s3bucket.bucket_name = bucket_name
                 om_s3bucket.creation_date = s3bucket.CreationDate.text
+                om_s3bucket.key_index = int(entry['key_index'])
                 s3bucket_maps.append(om_s3bucket)
 
             rm_bucket.append(RelationshipMap(compname=comp_id,

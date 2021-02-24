@@ -45,8 +45,6 @@ def sign_request(url, access_key, secret_key, method='GET', payload='', region='
     datestamp = t.strftime('%Y%m%d')
 
     host = url_comp.netloc
-    if ':' in host:
-        host = host.split(':')[0]
     payload_hash = hashlib.sha256((payload).encode('utf-8')).hexdigest()
 
     # Create a canonical request
@@ -59,7 +57,6 @@ def sign_request(url, access_key, secret_key, method='GET', payload='', region='
     canonical_querystring = url_comp.query
     canonical_request = '{0}\n{1}\n{2}\n{3}\n{4}\n{5}'.format(method, canonical_uri, canonical_querystring,
                                                               canonical_headers, signed_headers, payload_hash)
-
     canonical_hash = hashlib.sha256((canonical_request).encode('utf-8')).hexdigest()
 
     # Create a string to sign
@@ -80,6 +77,6 @@ def sign_request(url, access_key, secret_key, method='GET', payload='', region='
 
     headers = {'x-amz-date': [amzdate],
                'Authorization': [authorization_header],
-               'x-amz-content-sha256': ['e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'],
+               'x-amz-content-sha256': [payload_hash],
                }
     return headers

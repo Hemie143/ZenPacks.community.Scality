@@ -239,6 +239,7 @@ classes:
         label: Bucket Name
         grid_display: false
       key_index:
+        type: int
         grid_display: false
         details_display: false
 
@@ -562,7 +563,9 @@ device_classes:
                 rrdtype: GAUGE_MIN_0
               bucket_size:
                 rrdtype: GAUGE_MIN_0
-              response_time:
+              incoming_bytes:
+                rrdtype: GAUGE_MIN_0
+              outgoing_bytes:
                 rrdtype: GAUGE_MIN_0
         graphs:
           Bucket Size:
