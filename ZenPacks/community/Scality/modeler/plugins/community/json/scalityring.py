@@ -10,25 +10,17 @@ from bs4 import BeautifulSoup
 
 # Twisted Imports
 from twisted.internet.defer import inlineCallbacks, returnValue
-from twisted.web.client import Agent, readBody, BrowserLikePolicyForHTTPS
+from twisted.web.client import Agent, readBody
 from twisted.internet import reactor, ssl
 from twisted.web.http_headers import Headers
-from twisted.web.iweb import IPolicyForHTTPS
 
 # Zenoss Imports
 from Products.DataCollector.plugins.CollectorPlugin import PythonPlugin
 from Products.DataCollector.plugins.DataMaps import ObjectMap, RelationshipMap
-from zope.interface import implementer
 
 from ZenPacks.community.Scality.lib.aws4_sign import sign_request
+from ZenPacks.community.Scality.lib.utils import SkipCertifContextFactory
 
-@implementer(IPolicyForHTTPS)
-class SkipCertifContextFactory(object):
-    def __init__(self):
-        self.default_policy = BrowserLikePolicyForHTTPS()
-
-    def creatorForNetloc(self, hostname, port):
-        return ssl.CertificateOptions(verify=False)
 
 class scalityring(PythonPlugin):
 
