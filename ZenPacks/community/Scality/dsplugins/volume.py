@@ -1,19 +1,15 @@
+import base64
 import json
 import logging
-import base64
-
-# Twisted Imports
-from twisted.internet import reactor, ssl
-from twisted.internet.defer import returnValue, inlineCallbacks
-from twisted.web.client import Agent, readBody, BrowserLikePolicyForHTTPS
-from twisted.web.http_headers import Headers
-from twisted.web.iweb import IPolicyForHTTPS
-
-# Zenoss imports
-from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonDataSourcePlugin
-from zope.interface import implementer
 
 from ZenPacks.community.Scality.lib.utils import SkipCertifContextFactory
+# Zenoss imports
+from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonDataSourcePlugin
+# Twisted Imports
+from twisted.internet import reactor
+from twisted.internet.defer import returnValue, inlineCallbacks
+from twisted.web.client import Agent, readBody
+from twisted.web.http_headers import Headers
 
 # Setup logging
 log = logging.getLogger('zen.ScalityVolume')

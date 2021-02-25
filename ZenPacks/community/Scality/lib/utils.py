@@ -1,13 +1,10 @@
-import calendar
-
-# Zope imports
-from zope.interface import implementer
-
 # Twisted imports
 from twisted.internet import ssl
 from twisted.internet.defer import succeed
-from twisted.web.iweb import IBodyProducer, IPolicyForHTTPS
 from twisted.web.client import BrowserLikePolicyForHTTPS
+from twisted.web.iweb import IBodyProducer, IPolicyForHTTPS
+from zope.interface import implementer
+
 
 def get_time_range(t, duration=15):
     '''

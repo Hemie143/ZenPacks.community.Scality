@@ -1,25 +1,17 @@
 import json
 import logging
-import base64
 import time
-import datetime
 from collections import defaultdict
-from bs4 import BeautifulSoup
-from urllib import quote
 
+from ZenPacks.community.Scality.lib.aws4_sign import sign_request
+from ZenPacks.community.Scality.lib.utils import get_time_range, BytesProducer, SkipCertifContextFactory
+# Zenoss imports
+from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonDataSourcePlugin
 # Twisted Imports
 from twisted.internet import reactor
 from twisted.internet.defer import returnValue, inlineCallbacks
 from twisted.web.client import Agent, readBody
 from twisted.web.http_headers import Headers
-from twisted.web.iweb import IPolicyForHTTPS
-
-# Zenoss imports
-from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonDataSourcePlugin
-from zope.interface import implementer
-
-from ZenPacks.community.Scality.lib.aws4_sign import sign_request
-from ZenPacks.community.Scality.lib.utils import get_time_range, BytesProducer, SkipCertifContextFactory
 
 # Setup logging
 log = logging.getLogger('zen.ScalityS3Bucket')
