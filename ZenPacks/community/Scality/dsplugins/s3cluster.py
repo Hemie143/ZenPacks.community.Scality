@@ -13,18 +13,10 @@ from twisted.web.iweb import IPolicyForHTTPS
 from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonDataSourcePlugin
 from zope.interface import implementer
 
+from ZenPacks.community.Scality.lib.utils import SkipCertifContextFactory
+
 # Setup logging
 log = logging.getLogger('zen.ScalityS3Cluster')
-
-
-# TODO: Move this factory in a library
-@implementer(IPolicyForHTTPS)
-class SkipCertifContextFactory(object):
-    def __init__(self):
-        self.default_policy = BrowserLikePolicyForHTTPS()
-
-    def creatorForNetloc(self, hostname, port):
-        return ssl.CertificateOptions(verify=False)
 
 
 class S3Cluster(PythonDataSourcePlugin):
@@ -70,7 +62,7 @@ class S3Cluster(PythonDataSourcePlugin):
 
     @inlineCallbacks
     def collect(self, config):
-        log.debug('Starting ScalityRing collect')
+        log.debug('Starting S3Cluster collect')
 
         ds0 = config.datasources[0]
         scheme = 'https' if ds0.zScalityUseSSL else 'http'

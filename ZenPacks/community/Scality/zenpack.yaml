@@ -469,6 +469,7 @@ device_classes:
             base: true
             graphpoints:
               Growth per month:
+                legend: _ Growth per month
                 lineType: AREA
                 dpName: ring_planning_growth_month
                 sequence: 1
@@ -476,6 +477,7 @@ device_classes:
             units: days
             graphpoints:
               Days remaining:
+                legend: _ Days remaining
                 dpName: ring_planning_days_before_threshold
                 sequence: 1
           Objects:
@@ -540,6 +542,7 @@ device_classes:
             base: true
             graphpoints:
               Stored objects:
+                legend: _ Stored objects
                 lineType: AREA
                 dpName: node_nb_chunks
                 sequence: 1
@@ -582,16 +585,20 @@ device_classes:
             miny: 0
             graphpoints:
               Number of Objects:
+                legend: _ Number of Objects
                 lineType: AREA
                 dpName: s3bucket_num_objects
                 sequence: 1
-          Response Time:
-            units: seconds
+          Bandwidth:
+            units: bytes
             miny: 0
             graphpoints:
-              Response Time:
-                dpName: s3bucket_response_time
+              Inbound:
+                dpName: s3bucket_incoming_bytes
                 sequence: 1
+              Outbound:
+                dpName: s3bucket_outgoing_bytes
+                sequence: 2
 
       ScalityS3Cluster:
         targetPythonClass: ZenPacks.community.Scality.ScalityS3Cluster

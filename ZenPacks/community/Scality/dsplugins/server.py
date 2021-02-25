@@ -13,18 +13,11 @@ from twisted.web.iweb import IPolicyForHTTPS
 from ZenPacks.zenoss.PythonCollector.datasources.PythonDataSource import PythonDataSourcePlugin
 from zope.interface import implementer
 
+from ZenPacks.community.Scality.lib.utils import SkipCertifContextFactory
+
+
 # Setup logging
 log = logging.getLogger('zen.ScalityServer')
-
-
-# TODO: Move this factory in a library
-@implementer(IPolicyForHTTPS)
-class SkipCertifContextFactory(object):
-    def __init__(self):
-        self.default_policy = BrowserLikePolicyForHTTPS()
-
-    def creatorForNetloc(self, hostname, port):
-        return ssl.CertificateOptions(verify=False)
 
 
 class Server(PythonDataSourcePlugin):

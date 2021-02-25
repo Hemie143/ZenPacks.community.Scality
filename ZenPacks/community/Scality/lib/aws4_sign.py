@@ -24,10 +24,6 @@ def getSignatureKey(key, dateStamp, regionName, serviceName):
     return kSigning
 
 
-def get_sign():
-    return
-
-
 def sign_request(url, access_key, secret_key, method='GET', payload='', region='us-east-1', service='s3'):
     """
     This function implements the Signature version 4, and is currently only valid for the S3 service
@@ -51,6 +47,7 @@ def sign_request(url, access_key, secret_key, method='GET', payload='', region='
     canonical_headers = 'host:' + host + '\n' + \
                         'x-amz-content-sha256:' + payload_hash + '\n' + \
                         'x-amz-date:' + amzdate + '\n'
+
     signed_headers = 'host;x-amz-content-sha256;x-amz-date'
 
     canonical_uri = url_comp.path if url_comp.path else '/'
