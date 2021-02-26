@@ -85,7 +85,7 @@ class S3Bucket(PythonDataSourcePlugin):
                 try:
                     response = yield agent.request('POST', url, Headers(headers), body)
                     response_body = yield readBody(response)
-                    result[key_index] = response_body
+                    result[key_index] = json.loads(response_body)
                 except Exception as e:
                     log.exception('{}: failed to get server data for {}'.format(config.id, ds0))
                     log.exception('{}: Exception: {}'.format(config.id, e))
@@ -98,7 +98,13 @@ class S3Bucket(PythonDataSourcePlugin):
         for ds in config.datasources:
             bucket_name = ds.params['bucket_name']
             key_index = ds.params['key_index']
-            for bucket_data in json.loads(result[key_index]):
+            account_data = result[key_index]
+            # account_data should be a list of dicts
+            if isinstance(account_data, dict):
+                # TODO: Send event with content of message
+                # {"code":"AccessDenied","message":"Access Denied"}
+                continue
+            for bucket_data in account_data:
                 if bucket_data['bucketName'] == bucket_name:
                     break
             else:
