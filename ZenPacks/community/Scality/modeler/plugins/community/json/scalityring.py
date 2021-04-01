@@ -178,7 +178,7 @@ class scalityring(PythonPlugin):
         rm_bucket = []
         for entry in s3buckets:
             soup = BeautifulSoup(entry['body'], 'xml')
-
+            # TODO: What if the soup is empty ?
             om_owner = ObjectMap()
             id = 'bucketaccount_{}'.format(soup.find("Owner").find("ID").text)
             om_owner.id = self.prepId(id)

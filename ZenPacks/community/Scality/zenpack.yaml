@@ -1,5 +1,5 @@
 name: ZenPacks.community.Scality
-
+# TODO: Separate S3 from UTAPI keys
 zProperties:
   DEFAULTS:
     category: Scality
@@ -232,6 +232,13 @@ classes:
     label: Scality S3 Bucket
     monitoring_templates: [ScalityS3Bucket]
     properties:
+      bucket_size:
+        label: Size
+        renderer: Zenoss.render.bytesString
+        datapoint: s3bucket_bucket_size
+        datapoint_cached: true
+        grid_display: true
+        content_width: 100
       creation_date:
         label: Creation date
         grid_display: false
@@ -561,6 +568,7 @@ device_classes:
           s3bucket:
             type: Python
             plugin_classname: ZenPacks.community.Scality.dsplugins.s3bucket.S3Bucket
+            cycletime: '900'
             datapoints:
               num_objects:
                 rrdtype: GAUGE_MIN_0
