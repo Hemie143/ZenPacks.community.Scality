@@ -493,17 +493,112 @@ device_classes:
         - community.json.scalityring
 
     templates:
-      ScalitySupervisor:
-        targetPythonClass: ZenPacks.community.Scality.ScalitySupervisor
+      ScalityConnector:
+        targetPythonClass: ZenPacks.community.Scality.ScalityConnector
         datasources:
-          supervisor:
+          connector:
             type: Python
-            plugin_classname: ZenPacks.community.Scality.dsplugins.supervisor.Supervisor
+            plugin_classname: ZenPacks.community.Scality.dsplugins.connector.Connector
             datapoints:
               status:
                 rrdtype: GAUGE
-              bizstore_status:
+              state:
                 rrdtype: GAUGE
+
+      ScalityDisk:
+        targetPythonClass: ZenPacks.community.Scality.ScalityDisk
+        datasources:
+          disk:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.disk.Disk
+            datapoints:
+              status:
+                rrdtype: GAUGE
+              state:
+                rrdtype: GAUGE
+              number_inodes:
+                rrdtype: GAUGE
+              diskspace_total:
+                rrdtype: GAUGE
+              diskspace_used:
+                rrdtype: GAUGE
+              diskspace_stored:
+                rrdtype: GAUGE
+              diskspace_used_perc:
+                rrdtype: GAUGE
+        graphs:
+          Diskspace:
+            units: bytes
+            miny: 0
+            base: true
+            graphpoints:
+              Diskspace Total Capacity:
+                lineType: AREA
+                dpName: disk_diskspace_total
+                sequence: 1
+              Diskspace Used Capacity:
+                lineType: AREA
+                dpName: disk_diskspace_used
+                sequence: 2
+              Diskspace Used by RING:
+                lineType: AREA
+                dpName: disk_diskspace_stored
+                sequence: 3
+          Diskspace percentage:
+            units: percent
+            miny: 0
+            maxy: 100
+            graphpoints:
+              Diskspace Used Capacity:
+                dpName: disk_diskspace_used_perc
+                sequence: 1
+          inodes:
+            units: inodes
+            miny: 0
+            graphpoints:
+              inodes:
+                lineType: AREA
+                dpName: disk_number_inodes
+                sequence: 1
+
+      ScalityNode:
+        targetPythonClass: ZenPacks.community.Scality.ScalityNode
+        datasources:
+          node:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.node.Node
+            datapoints:
+              state:
+                rrdtype: GAUGE
+              reachable:
+                rrdtype: GAUGE
+              conf_mismatch:
+                rrdtype: GAUGE
+              nb_chunks:
+                rrdtype: GAUGE
+              nb_tasks:
+                rrdtype: GAUGE
+              tasks_blocked:
+                rrdtype: GAUGE
+        graphs:
+          Chunks:
+            units: chunks
+            miny: 0
+            base: true
+            graphpoints:
+              Stored objects:
+                legend: _ Stored objects
+                lineType: AREA
+                dpName: node_nb_chunks
+                sequence: 1
+          Tasks:
+            units: chunks
+            miny: 0
+            base: true
+            graphpoints:
+              Pending Tasks:
+                dpName: node_nb_tasks
+                sequence: 1
 
       ScalityRing:
         targetPythonClass: ZenPacks.community.Scality.ScalityRing
@@ -620,59 +715,6 @@ device_classes:
                 dpName: ring_object_average_unique_size
                 sequence: 2
 
-      ScalityServer:
-        targetPythonClass: ZenPacks.community.Scality.ScalityServer
-        datasources:
-          server:
-            type: Python
-            plugin_classname: ZenPacks.community.Scality.dsplugins.server.Server
-            datapoints:
-              diskstatus:
-                rrdtype: GAUGE
-              status:
-                rrdtype: GAUGE
-              state:
-                rrdtype: GAUGE
-
-      ScalityNode:
-        targetPythonClass: ZenPacks.community.Scality.ScalityNode
-        datasources:
-          node:
-            type: Python
-            plugin_classname: ZenPacks.community.Scality.dsplugins.node.Node
-            datapoints:
-              state:
-                rrdtype: GAUGE
-              reachable:
-                rrdtype: GAUGE
-              conf_mismatch:
-                rrdtype: GAUGE
-              nb_chunks:
-                rrdtype: GAUGE
-              nb_tasks:
-                rrdtype: GAUGE
-              tasks_blocked:
-                rrdtype: GAUGE
-        graphs:
-          Chunks:
-            units: chunks
-            miny: 0
-            base: true
-            graphpoints:
-              Stored objects:
-                legend: _ Stored objects
-                lineType: AREA
-                dpName: node_nb_chunks
-                sequence: 1
-          Tasks:
-            units: chunks
-            miny: 0
-            base: true
-            graphpoints:
-              Pending Tasks:
-                dpName: node_nb_tasks
-                sequence: 1
-
       ScalityS3Bucket:
         targetPythonClass: ZenPacks.community.Scality.ScalityS3Bucket
         datasources:
@@ -729,61 +771,31 @@ device_classes:
               health:
                 rrdtype: GAUGE
 
-      ScalityDisk:
-        targetPythonClass: ZenPacks.community.Scality.ScalityDisk
+      ScalityServer:
+        targetPythonClass: ZenPacks.community.Scality.ScalityServer
         datasources:
-          disk:
+          server:
             type: Python
-            plugin_classname: ZenPacks.community.Scality.dsplugins.disk.Disk
+            plugin_classname: ZenPacks.community.Scality.dsplugins.server.Server
             datapoints:
+              diskstatus:
+                rrdtype: GAUGE
               status:
                 rrdtype: GAUGE
               state:
                 rrdtype: GAUGE
-              number_inodes:
+
+      ScalitySupervisor:
+        targetPythonClass: ZenPacks.community.Scality.ScalitySupervisor
+        datasources:
+          supervisor:
+            type: Python
+            plugin_classname: ZenPacks.community.Scality.dsplugins.supervisor.Supervisor
+            datapoints:
+              status:
                 rrdtype: GAUGE
-              diskspace_total:
+              bizstore_status:
                 rrdtype: GAUGE
-              diskspace_used:
-                rrdtype: GAUGE
-              diskspace_stored:
-                rrdtype: GAUGE
-              diskspace_used_perc:
-                rrdtype: GAUGE
-        graphs:
-          Diskspace:
-            units: bytes
-            miny: 0
-            base: true
-            graphpoints:
-              Diskspace Total Capacity:
-                lineType: AREA
-                dpName: disk_diskspace_total
-                sequence: 1
-              Diskspace Used Capacity:
-                lineType: AREA
-                dpName: disk_diskspace_used
-                sequence: 2
-              Diskspace Used by RING:
-                lineType: AREA
-                dpName: disk_diskspace_stored
-                sequence: 3
-          Diskspace percentage:
-            units: percent
-            miny: 0
-            maxy: 100
-            graphpoints:
-              Diskspace Used Capacity:
-                dpName: disk_diskspace_used_perc
-                sequence: 1
-          inodes:
-            units: inodes
-            miny: 0
-            graphpoints:
-              inodes:
-                lineType: AREA
-                dpName: disk_number_inodes
-                sequence: 1
 
       ScalityVolume:
         targetPythonClass: ZenPacks.community.Scality.ScalityVolume
@@ -793,18 +805,6 @@ device_classes:
             plugin_classname: ZenPacks.community.Scality.dsplugins.volume.Volume
             datapoints:
               status:
-                rrdtype: GAUGE
-
-      ScalityConnector:
-        targetPythonClass: ZenPacks.community.Scality.ScalityConnector
-        datasources:
-          connector:
-            type: Python
-            plugin_classname: ZenPacks.community.Scality.dsplugins.connector.Connector
-            datapoints:
-              status:
-                rrdtype: GAUGE
-              state:
                 rrdtype: GAUGE
 
 event_classes:
