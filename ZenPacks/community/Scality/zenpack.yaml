@@ -37,16 +37,28 @@ classes:
       scalityServers:
         label: Servers
     properties:
-      get_supv2_status:
+      supv2_status:
         label: Status
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'Running'
+          1: 'Unreachable'
+          2: 'Invalid BizstoreSup credentials'
+          3: 'Unknown'
+        datapoint: supervisor_status
+        datapoint_cached: true
+        datapoint_default: 3
         grid_display: true
         label_width: 60
-      get_bizstoresup_status:
+      bizstoresup_status:
         label: BizStore Status
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'Running'
+          1: 'Unreachable'
+          2: 'Invalid BizstoreSup credentials'
+          3: 'Unknown'
+        datapoint: supervisor_bizstore_status
+        datapoint_cached: true
+        datapoint_default: 3
         grid_display: true
         label_width: 80
       version:
@@ -69,16 +81,29 @@ classes:
         label: Ring
         content_width: 80
     properties:
-      get_status:
+      status:
         label: Status
-        api_only: true
-        api_backendtype: method
-        grid_display: true
+        enum:
+          -1: 'UNKNOWN'
+          0: 'OK'
+          3: 'WARNING'
+          5: 'CRITICAL'
+        datapoint: connector_status
+        datapoint_cached: true
+        datapoint_default: -1
         label_width: 60
-      get_state:
+      state:
         label: State
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'OK'
+          1: 'NEED RELOAD'
+          2: 'CONFIG MISMATCH'
+          3: 'DOWN/OFFLINE'
+          4: 'DOWN'
+          5: 'OFFLINE'
+        datapoint: connector_state
+        datapoint_cached: true
+        datapoint_default: 0
         grid_display: true
         label_width: 120
       protocol:
@@ -109,16 +134,32 @@ classes:
         label: Server
         label_width: 100
     properties:
-      get_status:
+      status:
         label: Status
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'OK'
+          3: 'WARNING'
+          5: 'CRITICAL'
+        datapoint: disk_status
+        datapoint_cached: true
+        datapoint_default: 0
         grid_display: true
         label_width: 60
-      get_state:
+      state:
         label: State
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'OK'
+          1: 'CONNERR'
+          2: 'OOS_SYS'
+          3: 'CONNTIMEOUT'
+          4: 'STOREERR'
+          5: 'OFFLINE'
+          6: 'OOS_PERM'
+          7: 'OOS_TEMP'
+          8: 'DISKFULL'
+        datapoint: disk_state
+        datapoint_cached: true
+        datapoint_default: 0
         grid_display: true
         label_width: 60
       disk_id:
@@ -155,10 +196,33 @@ classes:
         label: Ring
         content_width: 80
     properties:
-      get_state:
+      state:
         label: State
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'RUN'
+          1: 'AVAILABLE'
+          2: 'NEW'
+          3: 'TASKS_BLOCKED'
+          4: 'LOOP'
+          5: 'LOADING'
+          6: 'LEAVING'
+          7: 'DSO CHANGING'
+          8: 'SPLIT'
+          9: 'CONF_MISMATCH'
+          10: 'ARC_REBUILD_NOK'
+          11: 'BAL(SRC)'
+          12: 'BAL(DST)'
+          13: 'OUT_OF_SERVICE'
+          14: 'NEED_RELOAD'
+          15: 'DISKERR'
+          16: 'DISKOFFLINE'
+          17: 'DISKWARN'
+          18: 'OFFLINE'
+          19: 'DUPKEY'
+          20: 'DISKFULL'
+        datapoint: node_state
+        datapoint_cached: true
+        datapoint_default: 0
         grid_display: true
         label_width: 60
       reachable:
@@ -207,16 +271,41 @@ classes:
         label: Type
         grid_display: true
         label_width: 60
-      get_status:
+      status:
         label: Status
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'OK'
+          1: 'NEED RELOAD'
+          2: 'CONFIG MISMATCH'
+          3: 'DOWN/OFFLINE'
+          4: 'DOWN'
+          5: 'OFFLINE'
+        datapoint: ring_status
+        datapoint_cached: true
+        datapoint_default: 0
         grid_display: true
         label_width: 60
-      get_state:
+      state:
         label: State
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'RUN'
+          1: 'BALANCING'
+          2: 'CONFIG MISMATCH'
+          3: 'OFFLINE'
+          4: 'DISK USAGE WARNING'
+          5: 'LOW STORAGE'
+          6: 'ARC_REBUILD_NOK'
+          7: 'MISSING NODE'
+          8: 'INCOMPLETE'
+          9: 'NOT STABILIZED'
+          10: 'OUT OF SERVICE'
+          11: 'DUPLICATE KEY'
+          12: 'DISK FULL'
+          13: 'SPLIT'
+          14: 'LOOP'
+        datapoint: ring_state
+        datapoint_cached: true
+        datapoint_default: 0
         grid_display: true
         label_width: 80
       planning_period:
@@ -258,10 +347,16 @@ classes:
       scalitySupervisor:
         grid_display: false
     properties:
-      get_cluster_health:
+      cluster_health:
         label: Cluster Health
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'NOMINAL'
+          1: 'UNAVAILABLE'
+          2: 'DEGRADED'
+          3: 'ERROR'
+        datapoint: s3cluster_health
+        datapoint_cached: true
+        datapoint_default: 0
         grid_display: true
         label_width: 100
       cluster_id:
@@ -294,16 +389,26 @@ classes:
         grid_display: true
         datapoint: server_diskstatus
         renderer: Zenoss.render.severity
-      get_status:
+      status:
         label: Status
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'OK'
+          3: 'WARNING'
+          5: 'CRITICAL'
+        datapoint: server_status
+        datapoint_cached: true
+        datapoint_default: 0
         grid_display: true
         label_width: 60
-      get_state:
+      state:
         label: State
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'ONLINE'
+          1: 'MISSING'
+          2: 'OFFLINE'
+        datapoint: server_state
+        datapoint_cached: true
+        datapoint_default: 0
         grid_display: true
         label_width: 80
       server_id:
@@ -327,10 +432,16 @@ classes:
       scalitySupervisor:
         grid_display: false
     properties:
-      get_status:
+      status:
         label: Status
-        api_only: true
-        api_backendtype: method
+        enum:
+          0: 'OK'
+          1: 'WARNING'
+          2: 'NO CONNECTOR'
+          3: 'CRITICAL'
+        datapoint: volume_status
+        datapoint_cached: true
+        datapoint_default: 0
         grid_display: true
         label_width: 60
       volume_id:
