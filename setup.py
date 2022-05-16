@@ -8,7 +8,7 @@ AUTHOR = "Laurent Hemeryck"
 LICENSE = "GPLv2"
 NAMESPACE_PACKAGES = ['ZenPacks', 'ZenPacks.community']
 PACKAGES = ['ZenPacks', 'ZenPacks.community', 'ZenPacks.community.Scality']
-INSTALL_REQUIRES = ['ZenPacks.zenoss.ZenPackLib']
+INSTALL_REQUIRES = ['ZenPacks.zenoss.ZenPackLib', 'ZenPacks.zenoss.PythonCollector']
 COMPAT_ZENOSS_VERS = ""
 PREV_ZENPACK_NAME = ""
 # STOP_REPLACEMENTS
